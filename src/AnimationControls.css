@@ -1,0 +1,84 @@
+#animationSlider {
+    -webkit-appearance: none;
+    margin: 0;
+    width: 100%;
+}
+#animationSlider:focus {
+    outline: none;
+}
+#animationSlider::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 2px;
+    background-color: white;
+    cursor: pointer;
+    animate: 0.2s;
+}
+#animationSlider::-webkit-slider-thumb {
+    width: 10px;
+    height: 10px;
+    background: #0097d5;
+    border: 1px solid #ffffff;
+    border-radius: 10px;
+    cursor: pointer;
+    -webkit-appearance: none;
+    margin-top: -4px;
+}
+#animationSlider:focus::-webkit-slider-runnable-track {
+    background: #367ebd;
+}
+#animationSlider::-moz-range-track {
+    width: 100%;
+    height: 8.4px;
+    cursor: pointer;
+    animate: 0.2s;
+    box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+    background: #3071a9;
+    border-radius: 1.3px;
+    border: 0.2px solid #010101;
+}
+#animationSlider::-moz-range-thumb {
+    box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+    border: 1px solid #000000;
+    height: 36px;
+    width: 16px;
+    border-radius: 3px;
+    background: #ffffff;
+    cursor: pointer;
+}
+#animationSlider::-ms-track {
+    width: 100%;
+    height: 8.4px;
+    cursor: pointer;
+    animate: 0.2s;
+    background: transparent;
+    border-color: transparent;
+    border-width: 16px 0;
+    color: transparent;
+}
+#animationSlider::-ms-fill-lower {
+    background: #2a6495;
+    border: 0.2px solid #010101;
+    border-radius: 2.6px;
+    box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+}
+#animationSlider::-ms-fill-upper {
+    background: #3071a9;
+    border: 0.2px solid #010101;
+    border-radius: 2.6px;
+    box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+}
+#animationSlider::-ms-thumb {
+    box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+    border: 1px solid #000000;
+    height: 36px;
+    width: 16px;
+    border-radius: 3px;
+    background: #ffffff;
+    cursor: pointer;
+}
+#animationSlider:focus::-ms-fill-lower {
+    background: #3071a9;
+}
+#animationSlider:focus::-ms-fill-upper {
+    background: #367ebd;
+}
