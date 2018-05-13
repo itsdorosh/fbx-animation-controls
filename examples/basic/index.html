@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>AnimationControls | Basic</title>
+	<link rel="stylesheet" href="../../src/AnimationControls.css">
+</head>
+
+<body>
+<div class="container" style="position: relative;"></div>
+
+<script src="../../libs/three.js" charset="utf-8"></script>
+<script src="../../libs/OrbitControls.js"></script>
+<script src="../../libs/FBXLoader.js" charset="utf-8"></script>
+<script src="../../libs/inflate.min.js"></script>
+<script src="../../src/AnimationControls.js" charset="utf-8"></script>
+<script>
+	const renderingContainer = document.querySelector('.container');
+	const scene = new THREE.Scene();
+	const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
+	const clock = new THREE.Clock();
+	camera.position.set(0, 250, 250);
+	const renderer = new THREE.WebGLRenderer();
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	renderingContainer.appendChild(renderer.domElement);
+
+	const orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
+	orbitControls.update();
+
+	var animationControls = new AnimationControls(renderingContainer, clock, {});
+
+	scene.background = new THREE.Color(0xa0a0a0);
+	light = new THREE.HemisphereLight(0xffffff, 0x444444);
+	scene.add(light);
+
+	light = new THREE.DirectionalLight(0xffffff);
+	light.castShadow = true;
+	light.shadow.camera.top = 180;
+	light.shadow.camera.bottom = -100;
+	light.shadow.camera.left = -120;
+	light.shadow.camera.right = 120;
+	scene.add(light);
+
+	var grid = new THREE.GridHelper(2000, 20, 0x000000, 0x000000);
+	grid.material.opacity = 0.2;
+	grid.material.transparent = true;
+	scene.add(grid);
+
+	var loader = new THREE.FBXLoader();
+	const now = performance.now();
+	loader.load('../../models/Dribble.fbx', function (fbx) {
+		window.fbx = fbx;
+		scene.add(fbx);
+		animationControls.attach(fbx, {needPlay: true});
+		console.log(`time left: ${performance.now() - now}`);
+	}, undefined, e => console.log(e));
+
+	window.addEventListener('resize', onWindowResize, false);
+
+	function onWindowResize() {
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.updateProjectionMatrix();
+		renderer.setSize(window.innerWidth, window.innerHeight);
+	}
+
+	var animate = function () {
+		requestAnimationFrame(animate);
+		orbitControls.update();
+		animationControls.update();
+		renderer.render(scene, camera);
+	};
+
+	animate();
+</script>
+</body>
+
+</html>

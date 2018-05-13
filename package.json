@@ -1,12 +1,15 @@
 {
-  "name": "AnimationPlayer",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+	"name": "AnimationControls",
+	"version": "1.0.0",
+	"description": "",
+	"main": "src/AnimationControls.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [],
+	"author": "itsdorosh",
+	"license": "MIT",
+	"devDependencies": {
+		"eslint-config-google": "^0.9.1"
+	}
 }
