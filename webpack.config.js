@@ -1,10 +1,10 @@
 const path = require('path');
 
 module.exports = () => ({
-  entry: './src/AnimationControls.js',
+  entry: './src/FBXAnimationControls.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'AnimationControls.js',
+    filename: 'FBXAnimationControls.js',
     publicPath: '/dist/',
   },
   devServer: {

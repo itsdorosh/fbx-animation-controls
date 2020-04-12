@@ -1,4 +1,4 @@
-class AnimationControls {
+class FBXAnimationControls {
 	constructor(domElement, clock, options) {
 		this.innerContainer = domElement;
 		this.clock = clock;
@@ -140,5 +140,3 @@ class AnimationControls {
 		}
 	}
 }
-
-THREE.AnimationControls = AnimationControls;

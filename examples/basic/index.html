@@ -13,7 +13,7 @@
 		<script src="../../libs/OrbitControls.js"></script>
 		<script src="../../libs/FBXLoader.js" charset="utf-8"></script>
 		<script src="../../libs/inflate.min.js"></script>
-		<script src="../../src/AnimationControls.js" charset="utf-8"></script>
+		<script src="../../src/FBXAnimationControls.js" charset="utf-8"></script>
 		<script>
 			const renderingContainer = document.querySelector(".container");
 			const scene = new THREE.Scene();
@@ -35,7 +35,7 @@
 			);
 			orbitControls.update();
 
-			var animationControls = new AnimationControls(
+			var animationControls = new FBXAnimationControls(
 				renderingContainer,
 				clock,
 				{}
