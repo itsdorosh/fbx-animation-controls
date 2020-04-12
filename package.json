@@ -1,12 +1,20 @@
 {
-  "name": "AnimationPlayer",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+	"name": "fbx-animation-controls",
+	"version": "1.1.0",
+	"description": "",
+	"main": "src/AnimationControls.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"serve": "webpack-dev-server",
+		"build": "webpack"
+	},
+	"keywords": [],
+	"author": "itsdorosh",
+	"license": "MIT",
+	"devDependencies": {
+		"eslint-config-google": "^0.9.1",
+		"webpack": "^4.42.1",
+		"webpack-cli": "^3.3.11",
+		"webpack-dev-server": "^3.10.3"
+	}
 }
