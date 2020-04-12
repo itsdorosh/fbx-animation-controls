@@ -1,3 +1,6 @@
-node_modules/
+# IDE and editor configurations
 .idea/
-models/
+.vscode/
+
+# dependencies
+node_modules/

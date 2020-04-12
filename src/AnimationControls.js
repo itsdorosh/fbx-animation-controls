@@ -9,13 +9,13 @@ class AnimationControls {
 
 		// TODO: display type like mm:ss:ms or ss:ms
 		this.ICONS = {
-			'PLAY': '⏵', 'PAUSE': '⏸', 'STOP': '⏹',
+			'PLAY': '▶️', 'PAUSE': '⏸', 'STOP': '⏹',
 			'REPEAT': '🔁', 'REPEAT_ONCE': '🔂', 'SHUFFLE': '🔀',
 			'REWIND': '⏪', 'FORWARD': '⏩',
 			'PREVIOUS': '⏮', 'NEXT': '⏭'
 		};
 
-		// TODO: Сделать свойства _attachedMesh и _playAnimation как getter/setter
+		// TODO: Implement properties _attachedMesh & _playAnimation as getter/setter
 		this._init();
 	}
 
@@ -39,20 +39,24 @@ class AnimationControls {
 		this.animationSlider = _createElement('input', {
 			'type': 'range', 'min': '0', 'max': '100', 'step': 'any', 'className': 'animationSlider'
 		});
-		this.playButton = _createElement('div', {'className': 'playButton'}, this.ICONS.PLAY);
-		this.currentTimeAnimation = _createElement('p', {'className': 'currentTimeAnimation'}, '--:--');
-		this.animationControlsContainer = _createElement('div', {'className': 'animationControlsContainer'},
+		this.playButton = _createElement('div', { 'className': 'playButton' }, this.ICONS.PLAY);
+		this.currentTimeAnimation = _createElement('p', { 'className': 'currentTimeAnimation' }, '--:--');
+		this.animationControlsContainer = _createElement('div', { 'className': 'animationControlsContainer' },
 			this.animationSlider, this.playButton, this.currentTimeAnimation);
 
 		this.innerContainer.appendChild(this.animationControlsContainer);
 
-		let status = undefined;
+		let status;
 
 		this.animationSlider.addEventListener('mousedown', () => {
 			status = this._playAnimation;
 			this.pause();
 		}, false);
-		this.animationSlider.addEventListener('input', () => this.SetTimePercentage(this.animationSlider.value), false);
+
+		this.animationSlider.addEventListener('input', () => {
+			this.SetTimePercentage(this.animationSlider.value);
+		}, false);
+
 		this.animationSlider.addEventListener('mouseup', () => {
 			if (status) this.play();
 		}, false);
@@ -86,9 +90,9 @@ class AnimationControls {
 		}
 	}
 
-	SetTimePercentage(per) {
+	SetTimePercentage(percentage) {
 		if (this._attachedMesh && this._animationAction) {
-			this._animationAction.time = (parseFloat(per) / 100) * this._animationAction._clip.duration;
+			this._animationAction.time = (parseFloat(percentage) / 100) * this._animationAction._clip.duration;
 			this.currentTimeAnimation.innerText = parseFloat(this._animationAction.time).toFixed(2);
 		}
 	}
