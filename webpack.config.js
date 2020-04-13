@@ -1,12 +1,13 @@
 const path = require('path');
 
 module.exports = () => ({
-	entry: './src/FBXAnimationControls.js',
+	entry: './src/main.js',
 	output: {
 		path: path.resolve(__dirname, 'dist'),
-		filename: 'FBXAnimationControls.js',
+		filename: 'bundle.js',
 		publicPath: '/dist/',
 	},
+	mode: "development",
 	module: {
 		rules: [
 			{
@@ -15,7 +16,11 @@ module.exports = () => ({
 				use: {
 					loader: 'babel-loader',
 					options: {
-						presets: ['@babel/preset-env']
+						presets: ['@babel/preset-env'],
+						plugins: [
+							'@babel/plugin-proposal-class-properties',
+							'@babel/plugin-proposal-private-methods'
+						],
 					}
 				}
 			}

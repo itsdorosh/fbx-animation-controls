@@ -21,7 +21,7 @@ const _createElement = function (tag, props, ...children) {
 	return element;
 };
 
-class FBXAnimationControls {
+export class FBXAnimationControls {
 
 	static getAnimationTimeDisplayString(time) {
 		if (!time) return;
