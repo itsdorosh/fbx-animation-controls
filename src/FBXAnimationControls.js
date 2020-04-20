@@ -1,8 +1,14 @@
 const ICONS = {
-	'PLAY': '▶️', 'PAUSE': '⏸', 'STOP': '⏹',
-	'REPEAT': '🔁', 'REPEAT_ONCE': '🔂', 'SHUFFLE': '🔀',
-	'REWIND': '⏪', 'FORWARD': '⏩',
-	'PREVIOUS': '⏮', 'NEXT': '⏭'
+	'PLAY': '▶️',
+	'PAUSE': '⏸',
+	'STOP': '⏹',
+	'REPEAT': '🔁',
+	'REPEAT_ONCE': '🔂',
+	'SHUFFLE': '🔀',
+	'REWIND': '⏪',
+	'FORWARD': '⏩',
+	'PREVIOUS': '⏮',
+	'NEXT': '⏭'
 };
 
 const _createElement = function (tag, props, ...children) {
@@ -24,7 +30,7 @@ const _createElement = function (tag, props, ...children) {
 export class FBXAnimationControls {
 
 	static getAnimationTimeDisplayString(time) {
-		if (!time) return;
+		if (time === undefined || isNaN(time)) throw new Error(`property 'time' can't be undefined or NaN`);
 
 		let t = new Date(parseInt((time * 1000).toFixed(0)));
 
