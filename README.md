@@ -1,14 +1,33 @@
 # fbx-animation-controls
 
-Simplest way to control your FBX animations (almost).
+The easiest way to control FBX animations (almost 😇).
 
-`npm i && npm run serve` for demo
+## Installation
+`npm install fbx-animation-controls --save`
+
+## Example of usage
+```js
+import {FBXAnimationControls} from 'fbx-animation-controls';
+
+const controls = new FBXAnimationControls(document.getElementById('viewer'));
+
+// in updateScene hook:
+controls.update();
+
+// in application logic:
+controls.attach(mesh, {play: true, atTime: 0.123});
+``` 
+
+## Properties
+- n/a
 
 ## Methods
-- `attach(mesh: Mesh, props: any): void`
-- `detach(): void`
+- `attach(mesh: Mesh, attachOptions: IAttachDetachOptions): void`
+- `detach(detachOptions: IAttachDetachOptions): void`
 - `play(): void`
 - `pause(): void`
-- `setTimePersentage(persentage): void`
+- `stop(): void`
+- `setTime(time: string): void`
+- `setPersentage(persentage: number): void`
 - `getCurrentAnimationTimeDisplayString(): string`
 - `update(): void`
