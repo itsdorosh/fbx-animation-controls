@@ -28,6 +28,6 @@ controls.attach(mesh, {play: true, atTime: 0.123});
 - `pause(): void`
 - `stop(): void`
 - `setTime(time: string): void`
-- `setPersentage(persentage: number): void`
+- `setPercentage(percentage: number): void`
 - `getCurrentAnimationTimeDisplayString(): string`
 - `update(): void`
