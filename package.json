@@ -1,6 +1,6 @@
 {
 	"name": "fbx-animation-controls",
-	"version": "1.2.0-alpha",
+	"version": "1.2.1-alpha",
 	"description": "",
 	"main": "src/index.js",
 	"scripts": {
