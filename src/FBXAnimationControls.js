@@ -1,3 +1,5 @@
+import {Clock} from "three";
+
 const ICONS = {
 	'PLAY': '▶️',
 	'PAUSE': '⏸',
@@ -51,22 +53,13 @@ export class FBXAnimationControls {
 		return `${mm}:${ss}:${ms}`;
 	}
 
-	__attachedMesh;
-	__animationAction;
-	__playAnimationFlag = false;
-	__duration = '--:--:--';
-	__innerContainer;
-	__clock;
-
 	constructor(domElement) {
+		this.__attachedMesh = null;
+		this.__animationAction = null;
+		this.__playAnimationFlag = false;
+		this.__duration = '--:--:--';
 		this.__innerContainer = domElement;
-		if(window.THREE && window.THREE.Clock) {
-			this.__clock = new window.THREE.Clock();
-		} else {
-			import {Clock} from 'three';
-			this.__clock = new Clock();
-		}
-
+		this.__clock = new Clock();
 		this.__init();
 	}
 
