@@ -1,4 +1,4 @@
-import {Clock} from "three";
+import {Clock, AnimationMixer} from "three";
 
 const ICONS = {
 	'PLAY': '▶️',
@@ -120,10 +120,10 @@ export class FBXAnimationControls {
 	attach(mesh, attachOptions) {
 		if (this.__attachedMesh !== mesh) {
 			this.__attachedMesh = mesh;
-			this.__attachedMesh.mixer = new THREE.AnimationMixer(mesh);
+			this.__attachedMesh.mixer = new AnimationMixer(mesh);
 			this.__animationAction = this.__attachedMesh.mixer.clipAction(this.__attachedMesh.animations[0]);
-			this.__duration = FBXAnimationControls.getAnimationTimeDisplayString(this.__animationAction.__clip.duration);
-			if (attachOptions && attachOptions.needPlay) {
+			this.__duration = FBXAnimationControls.getAnimationTimeDisplayString(this.__animationAction.getClip().duration);
+			if (attachOptions && attachOptions.play) {
 				this.play();
 			}
 		} else {
@@ -196,7 +196,7 @@ export class FBXAnimationControls {
 
 	setPercentage(percentage) {
 		if (this.__isAnimationAvailable()) {
-			this.__animationAction.time = (parseFloat(percentage) / 100) * this.__animationAction.__clip.duration;
+			this.__animationAction.time = (parseFloat(percentage) / 100) * this.__animationAction.getClip().duration;
 			this.currentAnimationTime.innerText = this.getCurrentAnimationTimeDisplayString();
 		}
 	}
@@ -210,7 +210,7 @@ export class FBXAnimationControls {
 		if (this.__animationAction && this.__playAnimationFlag) {
 			this.currentAnimationTime.innerText = this.getCurrentAnimationTimeDisplayString();
 			this.animationSlider.value =
-				`${(this.__animationAction.time.toFixed(3) / this.__animationAction.__clip.duration) * 100}`;
+				`${(this.__animationAction.time.toFixed(3) / this.__animationAction.getClip().duration) * 100}`;
 		}
 	}
 }
