@@ -27,6 +27,13 @@ const __createElement = function (tag, props, ...children) {
 	return element;
 };
 
+// TODO: add JSDoc in d.ts file with description of each method
+// TODO: add description about each css-class for customization
+
+// TODO: add implementation for setTime() method
+// TODO: add configurable thing for enable/disable html-elements for control animation
+// TODO: display type like mm:ss:ms or ss:ms (configurable from options passed in constructor)
+// TODO: add simple event system for notify about some events (e.g ANIMATION_STARTED, ANIMATION_PAUSED, ANIMATION_STOPPED)
 export class FBXAnimationControls {
 
 	static getAnimationTimeDisplayString(time) {
@@ -60,8 +67,6 @@ export class FBXAnimationControls {
 			this.__clock = new Clock();
 		}
 
-		// TODO: display type like mm:ss:ms or ss:ms (configurable from options passed in constructor)
-		// TODO: Implement properties __attachedMesh & __playAnimationFlag as getter/setter
 		this.__init();
 	}
 
@@ -133,6 +138,10 @@ export class FBXAnimationControls {
 		}
 	}
 
+	get attachedMesh() {
+		return this.__attachedMesh;
+	}
+
 	detach() {
 		this.__attachedMesh = undefined;
 		this.__animationAction = undefined;
@@ -154,6 +163,10 @@ export class FBXAnimationControls {
 		}
 	}
 
+	get isPlaying() {
+		return this.__playAnimationFlag;
+	}
+
 	pause() {
 		if (this.__isAnimationAvailable()) {
 			if (this.__playAnimationFlag) {
@@ -164,15 +177,25 @@ export class FBXAnimationControls {
 		}
 	}
 
+	get isPaused() {
+		return !this.__playAnimationFlag;
+	}
+
 	stop() {
 		if (this.__isAnimationAvailable()) {
 			if (this.__playAnimationFlag) {
 				this.__playAnimationFlag = false;
 				this.playButton.innerText = ICONS.STOP;
+				// TODO: research for this.__animationAction.stop
 				this.__animationAction.paused = true;
 				this.setPercentage(0);
 			}
 		}
+	}
+
+	get isStopped() {
+		// TODO: add private flag for it
+		return !this.__playAnimationFlag;
 	}
 
 	setTime(time) {
