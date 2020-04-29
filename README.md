@@ -31,3 +31,29 @@ controls.attach(mesh, {play: true, atTime: 0.123});
 - `setPercentage(percentage: number): void`
 - `getCurrentAnimationTimeDisplayString(): string`
 - `update(): void`
+
+## Styling
+
+So, for now you have two options for styling animation controls:
+
+- add to your main html file following (of course with correcting path):
+
+    ```html
+        <link rel="stylesheet" href="./node_modules/fbx-animation-controls/src/themes/default.css" />
+    ```
+- or add your own styles for the following selectors:
+
+    general:
+    - `.animationSlider`
+    - `.playButton`
+    - `.currentAnimationTime`
+
+    for a track:
+    - `.animationSlider::-webkit-slider-runnable-track`
+    - `.animationSlider::-moz-range-track`
+    - `.animationSlider::-ms-track`
+
+    for a thumb:
+    - `.animationSlider::-webkit-slider-thumb`
+    - `.animationSlider::-moz-range-thumb`
+    - `.animationSlider::-ms-thumb`

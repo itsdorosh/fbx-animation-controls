@@ -10,6 +10,11 @@ export interface IAttachDetachOptions {
 	atTime?: string;
 }
 
+export interface ControlsConfiguration {
+	outputFormat?: string;
+	initHTMLControls?: boolean;
+}
+
 export class FBXAnimationControls {
 	private __attachedMesh: Mesh;
 	private __animationAction: AnimationAction;
@@ -18,7 +23,7 @@ export class FBXAnimationControls {
 	private __innerContainer: HTMLElement;
 	private __clock: Clock;
 
-	constructor(renderingNode: HTMLElement, clock: Clock);
+	constructor(renderingNode: HTMLElement, configuration: ControlsConfiguration);
 
 	static getAnimationTimeDisplayString(time: string): string;
 
@@ -34,7 +39,7 @@ export class FBXAnimationControls {
 
 	public stop(): void;
 
-	public setTime(time: string): void;
+	public setTime(time: string | number): void;
 
 	public setPercentage(percentage: number): void;
 
