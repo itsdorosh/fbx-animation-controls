@@ -1,4 +1,6 @@
-const ICONS = {
+import {AnimationMixer, Clock} from "three";
+
+export const defaultIcons = {
 	'PLAY': '▶️',
 	'PAUSE': '⏸',
 	'STOP': '⏹',
@@ -11,7 +13,22 @@ const ICONS = {
 	'NEXT': '⏭'
 };
 
-const _createElement = function (tag, props, ...children) {
+export const outputTimeFormats = {
+	MM_SS_MS: 'MM_SS_MS',
+	SS_MS: 'SS_MS'
+};
+
+export const defaultConfiguration = {
+	outputFormat: outputTimeFormats.MM_SS_MS,
+	initHTMLControls: true,
+};
+
+export const timePlaceholders = {
+	[outputTimeFormats.MM_SS_MS]: '--:--:--',
+	[outputTimeFormats.SS_MS]: '--:--'
+};
+
+const __createElement = function (tag, props, ...children) {
 	const element = document.createElement(tag);
 
 	Object.keys(props).forEach(key => element[key] = props[key]);
@@ -29,42 +46,57 @@ const _createElement = function (tag, props, ...children) {
 
 export class FBXAnimationControls {
 
-	static getAnimationTimeDisplayString(time) {
+	constructor(domElement, configuration = defaultConfiguration) {
+		this.__configuration = configuration;
+		this.__timePlaceholder = timePlaceholders[configuration.outputFormat];
+		this.__attachedMesh = null;
+		this.__animationAction = null;
+		this.__playAnimationFlag = false;
+		this.__stopAnimationFlag = true;
+		this.__duration = this.__timePlaceholder;
+		this.__innerContainer = domElement;
+		this.__clock = new Clock();
+		if (this.__configuration.initHTMLControls) this.__init();
+	}
+
+	get attachedMesh() {
+		return this.__attachedMesh;
+	}
+
+	get isPlaying() {
+		return this.__playAnimationFlag;
+	}
+
+	get isPaused() {
+		return !this.__playAnimationFlag;
+	}
+
+	get isStopped() {
+		return this.__stopAnimationFlag;
+	}
+
+	get isHTMLControlsAvailable() {
+		return this.__configuration.initHTMLControls;
+	}
+
+	static getAnimationTimeDisplayString(time, outputFormat) {
 		if (time === undefined || isNaN(time)) throw new Error(`property 'time' can't be undefined or NaN`);
 
 		let t = new Date(parseInt((time * 1000).toFixed(0)));
 
-		let mm = t.getMinutes();
-		mm = mm < 10 ? '0' + mm : mm;
+		let ms = (t.getMilliseconds() / 10).toFixed(0);
+		ms = ms < 10 ? '0' + ms : ms === '100' ? '00' : ms;
 		let ss = t.getSeconds();
 		ss = ss < 10 ? '0' + ss : ss;
-		let ms = (t.getMilliseconds() / 10).toFixed(0);
-		ms = ms < 10 ? '0' + ms : ms;
+		let mm = t.getMinutes();
+		mm = ms === '00' ? mm++ : mm;
+		mm = mm < 10 ? '0' + mm : mm;
 
-		return `${mm}:${ss}:${ms}`;
+		return outputFormat === outputTimeFormats.MM_SS_MS ? `${mm}:${ss}:${ms}` : `${ss}:${ms}`;
 	}
 
-	#attachedMesh;
-	#animationAction;
-	#playAnimationFlag = false;
-
-	/**
-	 * @class FBXAnimationControls
-	 * @param domElement - where controls should appears
-	 * @param clock - global THREE.Clock
-	 */
-	constructor(domElement, clock) {
-		this.innerContainer = domElement;
-		this.clock = clock;
-		this._animationDurationDisplayString = '--:--:--';
-
-		// TODO: display type like mm:ss:ms or ss:ms (configurable from options passed in constructor)
-		// TODO: Implement properties _attachedMesh & #playAnimationFlag as getter/setter
-		this.#init();
-	}
-
-	#init() {
-		this.animationSlider = _createElement('input', {
+	__init() {
+		this.animationSlider = __createElement('input', {
 			type: 'range',
 			min: 0,
 			max: 100,
@@ -72,112 +104,143 @@ export class FBXAnimationControls {
 			className: 'animationSlider'
 		});
 
-		this.playButton = _createElement(
+		this.playButton = __createElement(
 			'div',
 			{className: 'playButton'},
-			ICONS.PLAY
+			defaultIcons.PLAY
 		);
 
-		this.currentTimeAnimation = _createElement(
+		this.currentAnimationTime = __createElement(
 			'p',
-			{className: 'currentTimeAnimation'},
-			`--:--:-- / ${this._animationDurationDisplayString}`
+			{className: 'currentAnimationTime'},
+			`${this.__timePlaceholder} / ${this.__duration}`
 		);
 
-		this.animationControlsContainer = _createElement(
+		this.animationControlsContainer = __createElement(
 			'div',
 			{className: 'animationControlsContainer'},
-			this.animationSlider, this.playButton, this.currentTimeAnimation
+			this.animationSlider, this.playButton, this.currentAnimationTime
 		);
 
-		this.innerContainer.appendChild(this.animationControlsContainer);
+		this.__innerContainer.appendChild(this.animationControlsContainer);
 
-		let status;
+		let isPlayingBeforeInteract;
 
 		this.animationSlider.addEventListener('mousedown', () => {
-			status = this.#playAnimationFlag;
+			isPlayingBeforeInteract = this.isPlaying;
 			this.pause();
 		}, false);
 
 		this.animationSlider.addEventListener('input', () => {
-			this.setTimePercentage(this.animationSlider.value);
+			this.setPercentage(this.animationSlider.value);
 		}, false);
 
 		this.animationSlider.addEventListener('mouseup', () => {
-			if (status) this.play();
+			if (isPlayingBeforeInteract) this.play();
 		}, false);
 
 		this.playButton.addEventListener('click', () => {
-			if (this.#playAnimationFlag) this.pause();
+			if (this.isPlaying) this.pause();
 			else this.play();
 		});
 	}
 
-	attach(mesh, props) {
-		if (this.#attachedMesh !== mesh) {
-			this.#attachedMesh = mesh;
-			this.#attachedMesh.mixer = new THREE.AnimationMixer(mesh);
-			this.#animationAction = this.#attachedMesh.mixer.clipAction(this.#attachedMesh.animations[0]);
-			this._animationDurationDisplayString = FBXAnimationControls.getAnimationTimeDisplayString(this.#animationAction._clip.duration);
-			if (props && props.needPlay) {
+	get __isAnimationAvailable() {
+		return this.__attachedMesh && this.__animationAction;
+	}
+
+	attach(mesh, attachOptions) {
+		if (!this.__attachedMesh || this.__attachedMesh !== mesh) {
+			this.__attachedMesh = mesh;
+			this.__attachedMesh.mixer = new AnimationMixer(mesh);
+			this.__animationAction = this.__attachedMesh.mixer.clipAction(this.__attachedMesh.animations[0]);
+			this.__duration = FBXAnimationControls.getAnimationTimeDisplayString(
+				this.__animationAction.getClip().duration,
+				this.__configuration.outputFormat
+			);
+
+			if (attachOptions && attachOptions.play) {
 				this.play();
 			}
 		} else {
-			return new Error('already attached');
+			throw new Error('already attached');
 		}
 	}
 
 	detach() {
-		this.#attachedMesh = undefined;
-		this.#animationAction = undefined;
-		this.currentTimeAnimation.innerText = '--:--:--';
+		this.__attachedMesh = undefined;
+		this.__animationAction = undefined;
+		this.currentAnimationTime.innerText = this.__timePlaceholder;
 		this.animationSlider.value = '50';
-		this.playButton.innerText = ICONS.STOP;
+		this.playButton.innerText = defaultIcons.STOP;
 	}
 
 	play() {
-		if (this.#attachedMesh && this.#animationAction) {
-			if (!this.#playAnimationFlag) {
-				this.#playAnimationFlag = true;
-				this.playButton.innerText = ICONS.PAUSE;
-				this.#animationAction.paused = false;
+		if (this.__isAnimationAvailable) {
+
+			if (this.isPaused || this.isStopped) {
+				this.__playAnimationFlag = true;
+				this.__stopAnimationFlag = false;
+				if (this.isHTMLControlsAvailable) this.playButton.innerText = defaultIcons.PAUSE;
+				this.__animationAction.paused = false;
 			}
-			if (!this.#animationAction.isRunning()) {
-				this.#animationAction.play();
+
+			if (!this.__animationAction.isRunning()) {
+				this.__animationAction.play();
 			}
 		}
 	}
 
 	pause() {
-		if (this.#attachedMesh && this.#animationAction) {
-			if (this.#playAnimationFlag) {
-				this.#playAnimationFlag = false;
-				this.playButton.innerText = ICONS.PLAY;
-				this.#animationAction.paused = true;
+		if (this.__isAnimationAvailable) {
+			if (this.__playAnimationFlag) {
+				this.__playAnimationFlag = false;
+				if (this.isHTMLControlsAvailable) this.playButton.innerText = defaultIcons.PLAY;
+				this.__animationAction.paused = true;
 			}
 		}
 	}
 
-	setTimePercentage(percentage) {
-		if (this.#attachedMesh && this.#animationAction) {
-			this.#animationAction.time = (parseFloat(percentage) / 100) * this.#animationAction._clip.duration;
-			this.currentTimeAnimation.innerText = this.getCurrentAnimationTimeDisplayString();
+	stop() {
+		if (this.__isAnimationAvailable) {
+			if (this.isPlaying) {
+				this.__playAnimationFlag = false;
+				this.__stopAnimationFlag = true;
+				this.__animationAction.stop();
+				if (this.isHTMLControlsAvailable) this.playButton.innerText = defaultIcons.STOP;
+				this.setPercentage(0);
+			}
+		}
+	}
+
+	setTime(time) {
+		this.__animationAction.time = typeof time === 'number' ? time : parseFloat(time);
+	}
+
+	setPercentage(percentage) {
+		if (this.__isAnimationAvailable && this.isHTMLControlsAvailable) {
+			this.__animationAction.time = (parseFloat(percentage) / 100) * this.__animationAction.getClip().duration;
+			if (this.isHTMLControlsAvailable) this.currentAnimationTime.innerText = this.getCurrentAnimationTimeDisplayString();
 		}
 	}
 
 	getCurrentAnimationTimeDisplayString() {
-		return `${FBXAnimationControls.getAnimationTimeDisplayString(this.#animationAction.time)} / ${this._animationDurationDisplayString}`;
+		return `${FBXAnimationControls.getAnimationTimeDisplayString(
+			this.__animationAction.time,
+			this.__configuration.outputFormat
+		)} / ${this.__duration}`;
 	}
 
-	/**
-	 * @method update
-	 * @description you should use this method where your animation-loop function is called
-	 */
 	update() {
-		if (this.#attachedMesh && this.#attachedMesh.mixer) this.#attachedMesh.mixer.update(this.clock.getDelta());
-		if (this.#animationAction && this.#playAnimationFlag) {
-			this.currentTimeAnimation.innerText = this.getCurrentAnimationTimeDisplayString();
-			this.animationSlider.value = `${(this.#animationAction.time.toFixed(3) / this.#animationAction._clip.duration) * 100}`;
+		if (this.__attachedMesh && this.__attachedMesh.mixer) this.__attachedMesh.mixer.update(this.__clock.getDelta());
+		if (this.__animationAction && this.isPlaying) this.__updateHTMLControlsIfAvailable();
+	}
+
+	__updateHTMLControlsIfAvailable() {
+		if (this.isHTMLControlsAvailable) {
+			this.currentAnimationTime.innerText = this.getCurrentAnimationTimeDisplayString();
+			this.animationSlider.value =
+				`${(this.__animationAction.time.toFixed(3) / this.__animationAction.getClip().duration) * 100}`;
 		}
 	}
 }
