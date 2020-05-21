@@ -5,12 +5,17 @@
 
 import {AnimationAction, Clock, Mesh} from "three";
 
-export interface IAttachDetachOptions {
+export enum OutputTimeFormats {
+	MM_SS_MS = 'MM_SS_MS',
+	SS_MS = 'SS_MS'
+}
+
+export interface IAttachOptions {
 	play?: boolean;
 	atTime?: string;
 }
 
-export interface ControlsConfiguration {
+export interface IControlsConfiguration {
 	outputFormat?: string;
 	initHTMLControls?: boolean;
 }
@@ -20,18 +25,30 @@ export class FBXAnimationControls {
 	private __animationAction: AnimationAction;
 	private __playAnimationFlag: boolean;
 	private __duration: string;
-	private __innerContainer: HTMLElement;
+	private __innerContainer: Element | HTMLElement;
 	private __clock: Clock;
 
-	constructor(renderingNode: HTMLElement, configuration: ControlsConfiguration);
+	constructor(renderingNode: Element | HTMLElement, configuration: IControlsConfiguration);
 
-	static getAnimationTimeDisplayString(time: string): string;
+	public get attachedMesh(): Mesh | null;
+
+	public get isPlaying(): boolean;
+
+	public get isPaused(): boolean;
+
+	public get isStopped(): boolean;
+
+	public get isHTMLControlsAvailable(): boolean;
+
+	static getAnimationTimeDisplayString(time: string, outputFormat: OutputTimeFormats): string;
 
 	private __init(): void;
 
-	public attach(mesh: Mesh, attachOptions: IAttachDetachOptions): void;
+	private __updateHTMLControlsIfAvailable(): void;
 
-	public detach(detachOptions: IAttachDetachOptions): void;
+	public attach(mesh: Mesh, attachOptions: IAttachOptions): void;
+
+	public detach(): void;
 
 	public play(): void;
 

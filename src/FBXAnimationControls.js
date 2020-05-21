@@ -79,6 +79,10 @@ export class FBXAnimationControls {
 		return this.__configuration.initHTMLControls;
 	}
 
+	get __isAnimationAvailable() {
+		return this.__attachedMesh && this.__animationAction;
+	}
+
 	static getAnimationTimeDisplayString(time, outputFormat) {
 		if (time === undefined || isNaN(time)) throw new Error(`property 'time' can't be undefined or NaN`);
 
@@ -145,10 +149,6 @@ export class FBXAnimationControls {
 		});
 	}
 
-	get __isAnimationAvailable() {
-		return this.__attachedMesh && this.__animationAction;
-	}
-
 	attach(mesh, attachOptions) {
 		if (!this.__attachedMesh || this.__attachedMesh !== mesh) {
 			this.__attachedMesh = mesh;
@@ -159,9 +159,11 @@ export class FBXAnimationControls {
 				this.__configuration.outputFormat
 			);
 
-			if (attachOptions && attachOptions.play) {
-				this.play();
+			if (attachOptions) {
+				if (attachOptions.play) this.play();
+				if (attachOptions.atTime) this.setTime(attachOptions.atTime);
 			}
+
 		} else {
 			throw new Error('already attached');
 		}

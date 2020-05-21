@@ -19,15 +19,19 @@ controls.attach(mesh, {play: true, atTime: 0.123});
 ``` 
 
 ## Properties
-- n/a
+- `attachedMesh: Mesh | null`
+- `isPlaying: boolean`
+- `isPaused: boolean`
+- `isStopped: boolean`
+- `isHTMLControlsAvailable: boolean`
 
 ## Methods
 - `attach(mesh: Mesh, attachOptions: IAttachDetachOptions): void`
-- `detach(detachOptions: IAttachDetachOptions): void`
+- `detach(): void`
 - `play(): void`
 - `pause(): void`
 - `stop(): void`
-- `setTime(time: string): void`
+- `setTime(time: string | number): void`
 - `setPercentage(percentage: number): void`
 - `getCurrentAnimationTimeDisplayString(): string`
 - `update(): void`
