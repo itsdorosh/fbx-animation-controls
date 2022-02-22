@@ -15,7 +15,7 @@
 	"license": "MIT",
 	"dependencies": {
 		"@types/three": "^0.103.2",
-		"three": "^0.125.0"
+		"three": "^0.137.0"
 	},
 	"devDependencies": {
 		"eslint-config-google": "^0.9.1"
