@@ -28,6 +28,14 @@ export const timePlaceholders = {
 	[outputTimeFormats.SS_MS]: '--:--'
 };
 
+export const eventTypes = {
+	PLAY: "PLAY",
+	PAUSE: "PAUSE",
+	STOP: "STOP",
+	MESH_ATTACHED: "MESH_ATTACHED",
+	MESH_DETACHED: "MESH_DETACHED",
+};
+
 const __createElement = function (tag, props, ...children) {
 	const element = document.createElement(tag);
 
@@ -45,6 +53,7 @@ const __createElement = function (tag, props, ...children) {
 };
 
 export class FBXAnimationControls {
+	__eventCallbacks = {};
 
 	constructor(domElement, configuration = defaultConfiguration) {
 		this.__configuration = configuration;
@@ -164,6 +173,7 @@ export class FBXAnimationControls {
 				if (attachOptions.atTime) this.setTime(attachOptions.atTime);
 			}
 
+			this.dispatch(eventTypes.MESH_ATTACHED);
 		} else {
 			throw new Error('already attached');
 		}
@@ -175,6 +185,7 @@ export class FBXAnimationControls {
 		this.currentAnimationTime.innerText = this.__timePlaceholder;
 		this.animationSlider.value = '50';
 		this.playButton.innerText = defaultIcons.STOP;
+		this.dispatch(eventTypes.MESH_DETACHED);
 	}
 
 	play() {
@@ -189,6 +200,7 @@ export class FBXAnimationControls {
 
 			if (!this.__animationAction.isRunning()) {
 				this.__animationAction.play();
+				this.dispatch(eventTypes.PLAY);
 			}
 		}
 	}
@@ -199,6 +211,7 @@ export class FBXAnimationControls {
 				this.__playAnimationFlag = false;
 				if (this.isHTMLControlsAvailable) this.playButton.innerText = defaultIcons.PLAY;
 				this.__animationAction.paused = true;
+				this.dispatch(eventTypes.PAUSE);
 			}
 		}
 	}
@@ -209,6 +222,7 @@ export class FBXAnimationControls {
 				this.__playAnimationFlag = false;
 				this.__stopAnimationFlag = true;
 				this.__animationAction.stop();
+				this.dispatch(eventTypes.STOP);
 				if (this.isHTMLControlsAvailable) this.playButton.innerText = defaultIcons.STOP;
 				this.setPercentage(0);
 			}
@@ -243,6 +257,16 @@ export class FBXAnimationControls {
 			this.currentAnimationTime.innerText = this.getCurrentAnimationTimeDisplayString();
 			this.animationSlider.value =
 				`${(this.__animationAction.time.toFixed(3) / this.__animationAction.getClip().duration) * 100}`;
+		}
+	}
+
+	on(eventName, callback) {
+		this.__eventCallbacks[eventName].push(callback);
+	}
+
+	dispatch(eventName) {
+		if (eventName in this.__eventCallbacks) {
+			this.__eventCallbacks[eventName].forEach(callback => callback());
 		}
 	}
 }
