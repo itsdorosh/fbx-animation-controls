@@ -20,6 +20,16 @@ export interface IControlsConfiguration {
 	initHTMLControls?: boolean;
 }
 
+export const eventTypes = {
+	PLAY: "PLAY",
+	PAUSE: "PAUSE",
+	STOP: "STOP",
+	MESH_ATTACHED: "MESH_ATTACHED",
+	MESH_DETACHED: "MESH_DETACHED",
+	CHANGE_PERCENTAGE: "CHANGE_PERCENTAGE",
+	CHANGE_TIME: "CHANGE_TIME",
+};
+
 export class FBXAnimationControls {
 	private __attachedMesh: Mesh;
 	private __animationAction: AnimationAction;

@@ -1,4 +1,4 @@
-import {AnimationMixer, Clock} from "three";
+import { AnimationMixer, Clock } from "three";
 
 export const defaultIcons = {
 	'PLAY': '▶️',
@@ -10,7 +10,7 @@ export const defaultIcons = {
 	'REWIND': '⏪',
 	'FORWARD': '⏩',
 	'PREVIOUS': '⏮',
-	'NEXT': '⏭'
+	'NEXT': '⏭',
 };
 
 export const outputTimeFormats = {
@@ -34,6 +34,8 @@ export const eventTypes = {
 	STOP: "STOP",
 	MESH_ATTACHED: "MESH_ATTACHED",
 	MESH_DETACHED: "MESH_DETACHED",
+	CHANGE_PERCENTAGE: "CHANGE_PERCENTAGE",
+	CHANGE_TIME: "CHANGE_TIME",
 };
 
 const __createElement = function (tag, props, ...children) {
@@ -53,8 +55,6 @@ const __createElement = function (tag, props, ...children) {
 };
 
 export class FBXAnimationControls {
-	__eventCallbacks = {};
-
 	constructor(domElement, configuration = defaultConfiguration) {
 		this.__configuration = configuration;
 		this.__timePlaceholder = timePlaceholders[configuration.outputFormat];
@@ -65,6 +65,7 @@ export class FBXAnimationControls {
 		this.__duration = this.__timePlaceholder;
 		this.__innerContainer = domElement;
 		this.__clock = new Clock();
+		this.__eventCallbacks = {};
 		if (this.__configuration.initHTMLControls) this.__init();
 	}
 
@@ -119,19 +120,19 @@ export class FBXAnimationControls {
 
 		this.playButton = __createElement(
 			'div',
-			{className: 'playButton'},
+			{ className: 'playButton' },
 			defaultIcons.PLAY
 		);
 
 		this.currentAnimationTime = __createElement(
 			'p',
-			{className: 'currentAnimationTime'},
+			{ className: 'currentAnimationTime' },
 			`${this.__timePlaceholder} / ${this.__duration}`
 		);
 
 		this.animationControlsContainer = __createElement(
 			'div',
-			{className: 'animationControlsContainer'},
+			{ className: 'animationControlsContainer' },
 			this.animationSlider, this.playButton, this.currentAnimationTime
 		);
 
@@ -146,6 +147,7 @@ export class FBXAnimationControls {
 
 		this.animationSlider.addEventListener('input', () => {
 			this.setPercentage(this.animationSlider.value);
+			this.dispatch(eventTypes.CHANGE_PERCENTAGE, this.animationSlider.value);
 		}, false);
 
 		this.animationSlider.addEventListener('mouseup', () => {
@@ -186,6 +188,7 @@ export class FBXAnimationControls {
 		this.animationSlider.value = '50';
 		this.playButton.innerText = defaultIcons.STOP;
 		this.dispatch(eventTypes.MESH_DETACHED);
+		this.dispatch(eventTypes.STOP);
 	}
 
 	play() {
@@ -195,10 +198,10 @@ export class FBXAnimationControls {
 				this.__playAnimationFlag = true;
 				this.__stopAnimationFlag = false;
 				if (this.isHTMLControlsAvailable) this.playButton.innerText = defaultIcons.PAUSE;
-				this.__animationAction.paused = false;
 			}
 
 			if (!this.__animationAction.isRunning()) {
+				this.__animationAction.paused = false;
 				this.__animationAction.play();
 				this.dispatch(eventTypes.PLAY);
 			}
@@ -261,12 +264,15 @@ export class FBXAnimationControls {
 	}
 
 	on(eventName, callback) {
+		if (!(eventName in this.__eventCallbacks)) {
+			this.__eventCallbacks[eventName] = [];
+		}
 		this.__eventCallbacks[eventName].push(callback);
 	}
 
-	dispatch(eventName) {
+	dispatch(eventName, data) {
 		if (eventName in this.__eventCallbacks) {
-			this.__eventCallbacks[eventName].forEach(callback => callback());
+			this.__eventCallbacks[eventName].forEach(callback => callback(data));
 		}
 	}
 }
