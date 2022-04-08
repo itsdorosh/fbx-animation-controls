@@ -2,6 +2,12 @@
 
 The easiest way to control FBX animations (almost 😇).
 
+Time management, animation control, attaching different meshes, switching to next animation tracks (in development) and so on.
+
+![fbx-animation-controls - how it looks like](./misc/fbx-animation-controls.png)
+
+---
+
 ## Installation
 `npm install fbx-animation-controls --save`
 
@@ -35,6 +41,20 @@ controls.attach(mesh, {play: true, atTime: 0.123});
 - `setPercentage(percentage: number): void`
 - `getCurrentAnimationTimeDisplayString(): string`
 - `update(): void`
+- `on(eventName)`
+
+## Event System
+Plugin may provide some information on deman, by subcsription on available events.
+
+Just call `controls.on(eventName)` and one of the following events (for now there is 7 events):
+
+- PLAY
+- PAUSE
+- STOP
+- MESH_ATTACHED
+- MESH_DETACHED
+- CHANGE_PERCENTAGE
+- CHANGE_TIME
 
 ## Styling
 
@@ -47,17 +67,17 @@ So, for now you have two options for styling animation controls:
     ```
 - or add your own styles for the following selectors:
 
-    general:
+    **general**:
     - `.animationSlider`
     - `.playButton`
     - `.currentAnimationTime`
 
-    for a track:
+    **for a track**:
     - `.animationSlider::-webkit-slider-runnable-track`
     - `.animationSlider::-moz-range-track`
     - `.animationSlider::-ms-track`
 
-    for a thumb:
+    **for a thumb**:
     - `.animationSlider::-webkit-slider-thumb`
     - `.animationSlider::-moz-range-thumb`
     - `.animationSlider::-ms-thumb`
