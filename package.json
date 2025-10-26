@@ -1,6 +1,6 @@
 {
 	"name": "fbx-animation-controls",
-	"version": "2.0.2",
+	"version": "2.0.3",
 	"description": "The easiest way to control FBX animations with Three.js. Time management, animation control, attaching different meshes, and more.",
 	"repository": {
 		"type": "git",
