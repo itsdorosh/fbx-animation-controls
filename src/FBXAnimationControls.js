@@ -1,21 +1,21 @@
-import { AnimationMixer, Clock } from "three";
+import { AnimationMixer, Clock } from 'three';
 
 export const defaultIcons = {
-	'PLAY': '▶️',
-	'PAUSE': '⏸',
-	'STOP': '⏹',
-	'REPEAT': '🔁',
-	'REPEAT_ONCE': '🔂',
-	'SHUFFLE': '🔀',
-	'REWIND': '⏪',
-	'FORWARD': '⏩',
-	'PREVIOUS': '⏮',
-	'NEXT': '⏭',
+	PLAY: '▶️',
+	PAUSE: '⏸',
+	STOP: '⏹',
+	REPEAT: '🔁',
+	REPEAT_ONCE: '🔂',
+	SHUFFLE: '🔀',
+	REWIND: '⏪',
+	FORWARD: '⏩',
+	PREVIOUS: '⏮',
+	NEXT: '⏭',
 };
 
 export const outputTimeFormats = {
 	MM_SS_MS: 'MM_SS_MS',
-	SS_MS: 'SS_MS'
+	SS_MS: 'SS_MS',
 };
 
 export const defaultConfiguration = {
@@ -25,26 +25,26 @@ export const defaultConfiguration = {
 
 export const timePlaceholders = {
 	[outputTimeFormats.MM_SS_MS]: '--:--:--',
-	[outputTimeFormats.SS_MS]: '--:--'
+	[outputTimeFormats.SS_MS]: '--:--',
 };
 
 export const eventTypes = {
-	PLAY: "PLAY",
-	PAUSE: "PAUSE",
-	STOP: "STOP",
-	MESH_ATTACHED: "MESH_ATTACHED",
-	MESH_DETACHED: "MESH_DETACHED",
-	CHANGE_PERCENTAGE: "CHANGE_PERCENTAGE",
-	CHANGE_TIME: "CHANGE_TIME",
+	PLAY: 'PLAY',
+	PAUSE: 'PAUSE',
+	STOP: 'STOP',
+	MESH_ATTACHED: 'MESH_ATTACHED',
+	MESH_DETACHED: 'MESH_DETACHED',
+	CHANGE_PERCENTAGE: 'CHANGE_PERCENTAGE',
+	CHANGE_TIME: 'CHANGE_TIME',
 };
 
 const __createElement = function (tag, props, ...children) {
 	const element = document.createElement(tag);
 
-	Object.keys(props).forEach(key => element[key] = props[key]);
+	Object.keys(props).forEach((key) => (element[key] = props[key]));
 
 	if (children.length > 0) {
-		children.forEach(child => {
+		children.forEach((child) => {
 			if (typeof child === 'string') {
 				child = document.createTextNode(child);
 			}
@@ -94,7 +94,7 @@ export class FBXAnimationControls {
 	}
 
 	static getAnimationTimeDisplayString(time, outputFormat) {
-		if (time === undefined || isNaN(time)) throw new Error(`property 'time' can't be undefined or NaN`);
+		if (time === undefined || isNaN(time)) throw new Error("property 'time' can't be undefined or NaN");
 
 		let t = new Date(parseInt((time * 1000).toFixed(0)));
 
@@ -115,14 +115,10 @@ export class FBXAnimationControls {
 			min: 0,
 			max: 100,
 			step: 'any',
-			className: 'animationSlider'
+			className: 'animationSlider',
 		});
 
-		this.playButton = __createElement(
-			'div',
-			{ className: 'playButton' },
-			defaultIcons.PLAY
-		);
+		this.playButton = __createElement('div', { className: 'playButton' }, defaultIcons.PLAY);
 
 		this.currentAnimationTime = __createElement(
 			'p',
@@ -133,26 +129,40 @@ export class FBXAnimationControls {
 		this.animationControlsContainer = __createElement(
 			'div',
 			{ className: 'animationControlsContainer' },
-			this.animationSlider, this.playButton, this.currentAnimationTime
+			this.animationSlider,
+			this.playButton,
+			this.currentAnimationTime
 		);
 
 		this.__innerContainer.appendChild(this.animationControlsContainer);
 
 		let isPlayingBeforeInteract;
 
-		this.animationSlider.addEventListener('mousedown', () => {
-			isPlayingBeforeInteract = this.isPlaying;
-			this.pause();
-		}, false);
+		this.animationSlider.addEventListener(
+			'mousedown',
+			() => {
+				isPlayingBeforeInteract = this.isPlaying;
+				this.pause();
+			},
+			false
+		);
 
-		this.animationSlider.addEventListener('input', () => {
-			this.setPercentage(this.animationSlider.value);
-			this.dispatch(eventTypes.CHANGE_PERCENTAGE, this.animationSlider.value);
-		}, false);
+		this.animationSlider.addEventListener(
+			'input',
+			() => {
+				this.setPercentage(this.animationSlider.value);
+				this.dispatch(eventTypes.CHANGE_PERCENTAGE, this.animationSlider.value);
+			},
+			false
+		);
 
-		this.animationSlider.addEventListener('mouseup', () => {
-			if (isPlayingBeforeInteract) this.play();
-		}, false);
+		this.animationSlider.addEventListener(
+			'mouseup',
+			() => {
+				if (isPlayingBeforeInteract) this.play();
+			},
+			false
+		);
 
 		this.playButton.addEventListener('click', () => {
 			if (this.isPlaying) this.pause();
@@ -182,18 +192,19 @@ export class FBXAnimationControls {
 	}
 
 	detach() {
-		this.__attachedMesh = undefined;
-		this.__animationAction = undefined;
-		this.currentAnimationTime.innerText = this.__timePlaceholder;
-		this.animationSlider.value = '50';
-		this.playButton.innerText = defaultIcons.STOP;
+		this.__attachedMesh = null;
+		this.__animationAction = null;
+		if (this.isHTMLControlsAvailable) {
+			this.currentAnimationTime.innerText = `${this.__timePlaceholder} / ${this.__timePlaceholder}`;
+			this.animationSlider.value = '0';
+			this.playButton.innerText = defaultIcons.PLAY;
+		}
 		this.dispatch(eventTypes.MESH_DETACHED);
 		this.dispatch(eventTypes.STOP);
 	}
 
 	play() {
 		if (this.__isAnimationAvailable) {
-
 			if (this.isPaused || this.isStopped) {
 				this.__playAnimationFlag = true;
 				this.__stopAnimationFlag = false;
@@ -233,17 +244,26 @@ export class FBXAnimationControls {
 	}
 
 	setTime(time) {
-		this.__animationAction.time = typeof time === 'number' ? time : parseFloat(time);
+		if (this.__isAnimationAvailable) {
+			this.__animationAction.time = typeof time === 'number' ? time : parseFloat(time);
+			this.dispatch(eventTypes.CHANGE_TIME, this.__animationAction.time);
+		}
 	}
 
 	setPercentage(percentage) {
-		if (this.__isAnimationAvailable && this.isHTMLControlsAvailable) {
+		if (this.__isAnimationAvailable) {
 			this.__animationAction.time = (parseFloat(percentage) / 100) * this.__animationAction.getClip().duration;
-			if (this.isHTMLControlsAvailable) this.currentAnimationTime.innerText = this.getCurrentAnimationTimeDisplayString();
+			if (this.isHTMLControlsAvailable) {
+				this.currentAnimationTime.innerText = this.getCurrentAnimationTimeDisplayString();
+			}
+			this.dispatch(eventTypes.CHANGE_TIME, this.__animationAction.time);
 		}
 	}
 
 	getCurrentAnimationTimeDisplayString() {
+		if (!this.__isAnimationAvailable) {
+			return `${this.__timePlaceholder} / ${this.__timePlaceholder}`;
+		}
 		return `${FBXAnimationControls.getAnimationTimeDisplayString(
 			this.__animationAction.time,
 			this.__configuration.outputFormat
@@ -258,8 +278,7 @@ export class FBXAnimationControls {
 	__updateHTMLControlsIfAvailable() {
 		if (this.isHTMLControlsAvailable) {
 			this.currentAnimationTime.innerText = this.getCurrentAnimationTimeDisplayString();
-			this.animationSlider.value =
-				`${(this.__animationAction.time.toFixed(3) / this.__animationAction.getClip().duration) * 100}`;
+			this.animationSlider.value = `${(this.__animationAction.time.toFixed(3) / this.__animationAction.getClip().duration) * 100}`;
 		}
 	}
 
@@ -272,7 +291,7 @@ export class FBXAnimationControls {
 
 	dispatch(eventName, data) {
 		if (eventName in this.__eventCallbacks) {
-			this.__eventCallbacks[eventName].forEach(callback => callback(data));
+			this.__eventCallbacks[eventName].forEach((callback) => callback(data));
 		}
 	}
 }

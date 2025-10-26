@@ -52,7 +52,9 @@
 	border: 1px solid #ffffff;
 	border-radius: 10px;
 	cursor: pointer;
-	box-shadow: 1px 1px 1px #000000, 0 0 1px #0d0d0d;
+	box-shadow:
+		1px 1px 1px #000000,
+		0 0 1px #0d0d0d;
 	-webkit-appearance: none;
 	margin-top: -4px;
 }
@@ -70,7 +72,9 @@
 }
 
 .animationControlsContainer .animationSlider::-moz-range-thumb {
-	box-shadow: 1px 1px 1px #000000, 0 0 1px #0d0d0d;
+	box-shadow:
+		1px 1px 1px #000000,
+		0 0 1px #0d0d0d;
 	border: 1px solid #ffffff;
 	border-radius: 10px;
 	height: 10px;
@@ -93,18 +97,24 @@
 	background: #2a6495;
 	border: 0.2px solid #010101;
 	border-radius: 2.6px;
-	box-shadow: 1px 1px 1px #000000, 0 0 1px #0d0d0d;
+	box-shadow:
+		1px 1px 1px #000000,
+		0 0 1px #0d0d0d;
 }
 
 .animationControlsContainer .animationSlider::-ms-fill-upper {
 	background: #3071a9;
 	border: 0.2px solid #010101;
 	border-radius: 2.6px;
-	box-shadow: 1px 1px 1px #000000, 0 0 1px #0d0d0d;
+	box-shadow:
+		1px 1px 1px #000000,
+		0 0 1px #0d0d0d;
 }
 
 .animationControlsContainer .animationSlider::-ms-thumb {
-	box-shadow: 1px 1px 1px #000000, 0 0 1px #0d0d0d;
+	box-shadow:
+		1px 1px 1px #000000,
+		0 0 1px #0d0d0d;
 	border: 1px solid #ffffff;
 	border-radius: 10px;
 	height: 10px;

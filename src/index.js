@@ -1,1 +1,1 @@
-export * from "./FBXAnimationControls";
+export * from './FBXAnimationControls';

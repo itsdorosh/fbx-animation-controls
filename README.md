@@ -1,83 +1,181 @@
 # fbx-animation-controls
 
-The easiest way to control FBX animations (almost 😇).
+The easiest way to control FBX animations with Three.js (almost 😇).
 
-Time management, animation control, attaching different meshes, switching to next animation tracks (in development) and so on.
+Provides time management, animation control, mesh attachment, and HTML-based controls for FBX animations in Three.js applications.
 
 ![fbx-animation-controls - how it looks like](./misc/fbx-animation-controls.png)
 
 ---
 
-## Installation
-`npm install fbx-animation-controls --save`
+## 🚀 Installation
+```bash
+npm install fbx-animation-controls --save
+```
 
-## Example of usage
+## 📖 Basic Usage
+
+### JavaScript
 ```js
-import {FBXAnimationControls} from 'fbx-animation-controls';
+import { FBXAnimationControls } from 'fbx-animation-controls';
 
 const controls = new FBXAnimationControls(document.getElementById('viewer'));
 
-// in updateScene hook:
-controls.update();
+// Attach an FBX mesh with animations
+controls.attach(mesh, { play: true, atTime: 0.123 });
 
-// in application logic:
-controls.attach(mesh, {play: true, atTime: 0.123});
-``` 
+// In your render loop:
+function animate() {
+    controls.update();
+    // ... your other render code
+    requestAnimationFrame(animate);
+}
+```
 
-## Properties
-- `attachedMesh: Mesh | null`
-- `isPlaying: boolean`
-- `isPaused: boolean`
-- `isStopped: boolean`
-- `isHTMLControlsAvailable: boolean`
+### TypeScript
+```ts
+import { FBXAnimationControls, IAttachOptions, IControlsConfiguration, OutputTimeFormats } from 'fbx-animation-controls';
 
-## Methods
-- `attach(mesh: Mesh, attachOptions: IAttachDetachOptions): void`
-- `detach(): void`
-- `play(): void`
-- `pause(): void`
-- `stop(): void`
-- `setTime(time: string | number): void`
-- `setPercentage(percentage: number): void`
-- `getCurrentAnimationTimeDisplayString(): string`
-- `update(): void`
-- `on(eventName)`
+const config: IControlsConfiguration = {
+    outputFormat: OutputTimeFormats.MM_SS_MS,
+    initHTMLControls: true
+};
 
-## Event System
-Plugin may provide some information on deman, by subcsription on available events.
+const controls = new FBXAnimationControls(document.getElementById('viewer')!, config);
 
-Just call `controls.on(eventName)` and one of the following events (for now there is 7 events):
+const attachOptions: IAttachOptions = {
+    play: true,
+    atTime: 2.5
+};
 
-- PLAY
-- PAUSE
-- STOP
-- MESH_ATTACHED
-- MESH_DETACHED
-- CHANGE_PERCENTAGE
-- CHANGE_TIME
+controls.attach(mesh, attachOptions);
+```
 
-## Styling
+## 📋 API Reference
 
-So, for now you have two options for styling animation controls:
+### Properties
+- `attachedMesh: Mesh | null` - Currently attached Three.js mesh
+- `isPlaying: boolean` - Whether animation is currently playing
+- `isPaused: boolean` - Whether animation is paused
+- `isStopped: boolean` - Whether animation is stopped
+- `isHTMLControlsAvailable: boolean` - Whether HTML controls are initialized
 
-- add to your main html file following (of course with correcting path):
+### Methods
 
-    ```html
-        <link rel="stylesheet" href="./node_modules/fbx-animation-controls/src/themes/default.css" />
-    ```
-- or add your own styles for the following selectors:
+#### `attach(mesh: Mesh, attachOptions?: IAttachOptions): void`
+Attach a Three.js mesh with FBX animations.
 
-    **general**:
-    - `.animationSlider`
-    - `.playButton`
-    - `.currentAnimationTime`
+**Parameters:**
+- `mesh` - Three.js Mesh object with animations
+- `attachOptions` - Optional configuration object
+  - `play?: boolean` - Auto-play animation after attachment
+  - `atTime?: string | number` - Start time for the animation
 
-    **for a track**:
-    - `.animationSlider::-webkit-slider-runnable-track`
-    - `.animationSlider::-moz-range-track`
-    - `.animationSlider::-ms-track`
+#### `detach(): void`
+Detach the current mesh and reset controls.
 
-    **for a thumb**:
-    - `.animationSlider::-webkit-slider-thumb`
-    - `.animationSlider::-moz-range-thumb`
-    - `.animationSlider::-ms-thumb`
+#### `play(): void`
+Start playing the animation.
+
+#### `pause(): void`
+Pause the animation at current time.
+
+#### `stop(): void`
+Stop the animation and reset to beginning.
+
+#### `setTime(time: string | number): void`
+Set the current animation time.
+
+#### `setPercentage(percentage: number): void`
+Set animation progress as percentage (0-100).
+
+#### `getCurrentAnimationTimeDisplayString(): string`
+Get formatted string of current animation time.
+
+#### `update(): void`
+Update the animation mixer. **Call this in your render loop!**
+
+#### `on(eventName: string, callback: (data?: any) => void): void`
+Subscribe to animation events.
+
+### Configuration
+
+```ts
+interface IControlsConfiguration {
+    outputFormat?: OutputTimeFormats;  // Time display format
+    initHTMLControls?: boolean;        // Whether to create HTML controls
+}
+
+enum OutputTimeFormats {
+    MM_SS_MS = 'MM_SS_MS',  // 01:23:45 format
+    SS_MS = 'SS_MS'         // 23:45 format
+}
+```
+
+## 🎯 Event System
+
+Subscribe to events to get notified of animation state changes:
+
+```js
+controls.on('PLAY', () => console.log('Animation started'));
+controls.on('PAUSE', () => console.log('Animation paused'));
+controls.on('STOP', () => console.log('Animation stopped'));
+controls.on('MESH_ATTACHED', () => console.log('Mesh attached'));
+controls.on('MESH_DETACHED', () => console.log('Mesh detached'));
+controls.on('CHANGE_PERCENTAGE', (percentage) => console.log('Progress:', percentage));
+controls.on('CHANGE_TIME', (time) => console.log('Time:', time));
+```
+
+**Available Events:**
+- `PLAY` - Animation started
+- `PAUSE` - Animation paused  
+- `STOP` - Animation stopped
+- `MESH_ATTACHED` - Mesh attached to controls
+- `MESH_DETACHED` - Mesh detached from controls
+- `CHANGE_PERCENTAGE` - Animation progress changed
+- `CHANGE_TIME` - Animation time changed
+
+## 🎨 Styling
+
+### Option 1: Use Default Styles
+Add to your HTML file:
+```html
+<link rel="stylesheet" href="./node_modules/fbx-animation-controls/src/themes/default.css" />
+```
+
+### Option 2: Custom Styles
+Style these CSS selectors according to your design:
+
+**General Elements:**
+- `.animationSlider` - Range input slider
+- `.playButton` - Play/pause button
+- `.currentAnimationTime` - Time display text
+
+**Slider Track (cross-browser):**
+- `.animationSlider::-webkit-slider-runnable-track` (WebKit)
+- `.animationSlider::-moz-range-track` (Firefox)
+- `.animationSlider::-ms-track` (IE/Edge)
+
+**Slider Thumb (cross-browser):**
+- `.animationSlider::-webkit-slider-thumb` (WebKit)
+- `.animationSlider::-moz-range-thumb` (Firefox)
+- `.animationSlider::-ms-thumb` (IE/Edge)
+
+## 🔧 Development
+
+```bash
+# Lint code
+npm run lint
+
+# Format code  
+npm run format
+
+# Check everything
+npm run check
+```
+
+## 📄 License
+MIT
+
+## 🤝 Contributing
+Issues and pull requests are welcome!

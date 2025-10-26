@@ -3,42 +3,47 @@
 
 /// <reference types="three" />
 
-import {AnimationAction, Clock, Mesh} from "three";
+import { AnimationAction, Clock, Mesh } from 'three';
 
 export enum OutputTimeFormats {
 	MM_SS_MS = 'MM_SS_MS',
-	SS_MS = 'SS_MS'
+	SS_MS = 'SS_MS',
 }
 
 export interface IAttachOptions {
 	play?: boolean;
-	atTime?: string;
+	atTime?: string | number;
 }
 
 export interface IControlsConfiguration {
-	outputFormat?: string;
+	outputFormat?: OutputTimeFormats;
 	initHTMLControls?: boolean;
 }
 
-export enum eventTypes {
-	PLAY = "PLAY",
-	PAUSE = "PAUSE",
-	STOP = "STOP",
-	MESH_ATTACHED = "MESH_ATTACHED",
-	MESH_DETACHED = "MESH_DETACHED",
-	CHANGE_PERCENTAGE = "CHANGE_PERCENTAGE",
-	CHANGE_TIME = "CHANGE_TIME",
+export enum EventTypes {
+	PLAY = 'PLAY',
+	PAUSE = 'PAUSE',
+	STOP = 'STOP',
+	MESH_ATTACHED = 'MESH_ATTACHED',
+	MESH_DETACHED = 'MESH_DETACHED',
+	CHANGE_PERCENTAGE = 'CHANGE_PERCENTAGE',
+	CHANGE_TIME = 'CHANGE_TIME',
 }
 
+export type EventCallback = (data?: any) => void;
+
 export class FBXAnimationControls {
-	private __attachedMesh: Mesh;
-	private __animationAction: AnimationAction;
+	private __attachedMesh: Mesh | null;
+	private __animationAction: AnimationAction | null;
 	private __playAnimationFlag: boolean;
+	private __stopAnimationFlag: boolean;
 	private __duration: string;
 	private __innerContainer: Element | HTMLElement;
 	private __clock: Clock;
+	private __eventCallbacks: Record<string, EventCallback[]>;
+	private __configuration: IControlsConfiguration;
 
-	constructor(renderingNode: Element | HTMLElement, configuration: IControlsConfiguration);
+	constructor(renderingNode: Element | HTMLElement, configuration?: IControlsConfiguration);
 
 	public get attachedMesh(): Mesh | null;
 
@@ -50,13 +55,13 @@ export class FBXAnimationControls {
 
 	public get isHTMLControlsAvailable(): boolean;
 
-	static getAnimationTimeDisplayString(time: string, outputFormat: OutputTimeFormats): string;
+	static getAnimationTimeDisplayString(time: number, outputFormat: OutputTimeFormats): string;
 
 	private __init(): void;
 
 	private __updateHTMLControlsIfAvailable(): void;
 
-	public attach(mesh: Mesh, attachOptions: IAttachOptions): void;
+	public attach(mesh: Mesh, attachOptions?: IAttachOptions): void;
 
 	public detach(): void;
 
@@ -74,5 +79,7 @@ export class FBXAnimationControls {
 
 	public update(): void;
 
-	public on(eventName: eventTypes): void;
+	public on(eventName: EventTypes | string, callback: EventCallback): void;
+
+	public dispatch(eventName: EventTypes | string, data?: any): void;
 }
