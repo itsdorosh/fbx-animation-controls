@@ -9,6 +9,7 @@ Provides time management, animation control, mesh attachment, and HTML-based con
 ---
 
 ## 🚀 Installation
+
 ```bash
 npm install fbx-animation-controls --save
 ```
@@ -16,6 +17,7 @@ npm install fbx-animation-controls --save
 ## 📖 Basic Usage
 
 ### JavaScript
+
 ```js
 import { FBXAnimationControls } from 'fbx-animation-controls';
 
@@ -33,6 +35,7 @@ function animate() {
 ```
 
 ### TypeScript
+
 ```ts
 import { FBXAnimationControls, IAttachOptions, IControlsConfiguration, OutputTimeFormats } from 'fbx-animation-controls';
 
@@ -54,6 +57,7 @@ controls.attach(mesh, attachOptions);
 ## 📋 API Reference
 
 ### Properties
+
 - `attachedMesh: Mesh | null` - Currently attached Three.js mesh
 - `isPlaying: boolean` - Whether animation is currently playing
 - `isPaused: boolean` - Whether animation is paused
@@ -63,39 +67,50 @@ controls.attach(mesh, attachOptions);
 ### Methods
 
 #### `attach(mesh: Mesh, attachOptions?: IAttachOptions): void`
+
 Attach a Three.js mesh with FBX animations.
 
 **Parameters:**
+
 - `mesh` - Three.js Mesh object with animations
 - `attachOptions` - Optional configuration object
   - `play?: boolean` - Auto-play animation after attachment
   - `atTime?: string | number` - Start time for the animation
 
 #### `detach(): void`
+
 Detach the current mesh and reset controls.
 
 #### `play(): void`
+
 Start playing the animation.
 
 #### `pause(): void`
+
 Pause the animation at current time.
 
 #### `stop(): void`
+
 Stop the animation and reset to beginning.
 
 #### `setTime(time: string | number): void`
+
 Set the current animation time.
 
 #### `setPercentage(percentage: number): void`
+
 Set animation progress as percentage (0-100).
 
 #### `getCurrentAnimationTimeDisplayString(): string`
+
 Get formatted string of current animation time.
 
 #### `update(): void`
+
 Update the animation mixer. **Call this in your render loop!**
 
 #### `on(eventName: string, callback: (data?: any) => void): void`
+
 Subscribe to animation events.
 
 ### Configuration
@@ -127,6 +142,7 @@ controls.on('CHANGE_TIME', (time) => console.log('Time:', time));
 ```
 
 **Available Events:**
+
 - `PLAY` - Animation started
 - `PAUSE` - Animation paused  
 - `STOP` - Animation stopped
@@ -138,25 +154,31 @@ controls.on('CHANGE_TIME', (time) => console.log('Time:', time));
 ## 🎨 Styling
 
 ### Option 1: Use Default Styles
+
 Add to your HTML file:
+
 ```html
 <link rel="stylesheet" href="./node_modules/fbx-animation-controls/src/themes/default.css" />
 ```
 
 ### Option 2: Custom Styles
+
 Style these CSS selectors according to your design:
 
 **General Elements:**
+
 - `.animationSlider` - Range input slider
 - `.playButton` - Play/pause button
 - `.currentAnimationTime` - Time display text
 
 **Slider Track (cross-browser):**
+
 - `.animationSlider::-webkit-slider-runnable-track` (WebKit)
 - `.animationSlider::-moz-range-track` (Firefox)
 - `.animationSlider::-ms-track` (IE/Edge)
 
 **Slider Thumb (cross-browser):**
+
 - `.animationSlider::-webkit-slider-thumb` (WebKit)
 - `.animationSlider::-moz-range-thumb` (Firefox)
 - `.animationSlider::-ms-thumb` (IE/Edge)
@@ -175,7 +197,9 @@ npm run check
 ```
 
 ## 📄 License
+
 MIT
 
 ## 🤝 Contributing
+
 Issues and pull requests are welcome!
