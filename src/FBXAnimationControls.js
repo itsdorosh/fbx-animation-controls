@@ -96,15 +96,35 @@ export class FBXAnimationControls {
 	static getAnimationTimeDisplayString(time, outputFormat) {
 		if (time === undefined || isNaN(time)) throw new Error("property 'time' can't be undefined or NaN");
 
-		let t = new Date(parseInt((time * 1000).toFixed(0)));
+		// Handle edge cases that might occur due to floating-point precision issues
+		if (time < 0) {
+			time = 0; // Clamp negative values to 0
+		}
 
-		let ms = (t.getMilliseconds() / 10).toFixed(0);
-		ms = ms < 10 ? '0' + ms : ms === '100' ? '00' : ms;
-		let ss = t.getSeconds();
-		ss = ss < 10 ? '0' + ss : ss;
-		let mm = t.getMinutes();
-		mm = ms === '00' ? mm++ : mm;
-		mm = mm < 10 ? '0' + mm : mm;
+		// Convert time to total milliseconds with more robust handling
+		let totalMs = Math.round(time * 1000);
+
+		// Ensure totalMs is a valid positive integer
+		if (!Number.isFinite(totalMs) || totalMs < 0) {
+			totalMs = 0;
+		}
+
+		// Calculate minutes, seconds, and centiseconds using more explicit math
+		const minutes = Math.floor(totalMs / 60000);
+		const remainingMsAfterMinutes = totalMs % 60000;
+		const seconds = Math.floor(remainingMsAfterMinutes / 1000);
+		const remainingMsAfterSeconds = remainingMsAfterMinutes % 1000;
+		const centiseconds = Math.floor(remainingMsAfterSeconds / 10);
+
+		// Ensure all components are valid
+		const safeMinutes = Math.max(0, Math.floor(minutes)) || 0;
+		const safeSeconds = Math.max(0, Math.floor(seconds)) || 0;
+		const safeCentiseconds = Math.max(0, Math.floor(centiseconds)) || 0;
+
+		// Format with leading zeros
+		const mm = safeMinutes.toString().padStart(2, '0');
+		const ss = safeSeconds.toString().padStart(2, '0');
+		const ms = safeCentiseconds.toString().padStart(2, '0');
 
 		return outputFormat === outputTimeFormats.MM_SS_MS ? `${mm}:${ss}:${ms}` : `${ss}:${ms}`;
 	}
@@ -252,7 +272,9 @@ export class FBXAnimationControls {
 
 	setPercentage(percentage) {
 		if (this.__isAnimationAvailable) {
-			this.__animationAction.time = (parseFloat(percentage) / 100) * this.__animationAction.getClip().duration;
+			const calculatedTime = (parseFloat(percentage) / 100) * this.__animationAction.getClip().duration;
+			// Ensure time is never negative due to floating-point precision issues
+			this.__animationAction.time = Math.max(0, calculatedTime);
 			if (this.isHTMLControlsAvailable) {
 				this.currentAnimationTime.innerText = this.getCurrentAnimationTimeDisplayString();
 			}
@@ -278,7 +300,8 @@ export class FBXAnimationControls {
 	__updateHTMLControlsIfAvailable() {
 		if (this.isHTMLControlsAvailable) {
 			this.currentAnimationTime.innerText = this.getCurrentAnimationTimeDisplayString();
-			this.animationSlider.value = `${(this.__animationAction.time.toFixed(3) / this.__animationAction.getClip().duration) * 100}`;
+			// Use higher precision for slider value to reduce stepping issues during manual scrubbing
+			this.animationSlider.value = `${(this.__animationAction.time / this.__animationAction.getClip().duration) * 100}`;
 		}
 	}
 

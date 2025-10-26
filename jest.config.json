@@ -8,5 +8,7 @@
 		"!src/**/*.test.js",
 		"!src/__tests__/**/*.js"
 	],
-	"transform": {}
+	"transform": {
+		"^.+\\.js$": "babel-jest"
+	}
 }
