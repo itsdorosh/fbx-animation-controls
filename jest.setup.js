@@ -31,10 +31,25 @@ if (typeof document !== 'undefined') {
 	document.createElement = function (tag) {
 		const element = originalCreateElement(tag);
 
-		// Ensure all necessary methods exist for testing
-		if (!element.addEventListener) {
-			element.addEventListener = jest.fn();
-		}
+		// Store event handlers for testing
+		element._eventHandlers = {};
+
+		// Enhanced addEventListener that stores handlers
+		element.addEventListener = jest.fn((eventType, handler, options) => {
+			if (!element._eventHandlers[eventType]) {
+				element._eventHandlers[eventType] = [];
+			}
+			element._eventHandlers[eventType].push(handler);
+		});
+
+		// Add dispatchEvent for testing
+		element.dispatchEvent = jest.fn((event) => {
+			const handlers = element._eventHandlers[event.type];
+			if (handlers) {
+				handlers.forEach(handler => handler(event));
+			}
+		});
+
 		if (!element.appendChild) {
 			element.appendChild = jest.fn();
 		}
