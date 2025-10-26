@@ -1,5 +1,11 @@
 # fbx-animation-controls
 
+[![npm version](https://badge.fury.io/js/fbx-animation-controls.svg)](https://badge.fury.io/js/fbx-animation-controls)
+[![npm downloads](https://img.shields.io/npm/dm/fbx-animation-controls.svg)](https://www.npmjs.com/package/fbx-animation-controls)
+[![npm bundle size](https://img.shields.io/bundlephobia/minzip/fbx-animation-controls)](https://bundlephobia.com/package/fbx-animation-controls)
+[![GitHub license](https://img.shields.io/github/license/itsdorosh/fbx-animation-controls.svg)](https://github.com/itsdorosh/fbx-animation-controls/blob/master/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/itsdorosh/fbx-animation-controls.svg?style=social)](https://github.com/itsdorosh/fbx-animation-controls/stargazers)
+
 The easiest way to control FBX animations with Three.js (almost 😇).
 
 Provides time management, animation control, mesh attachment, and HTML-based controls for FBX animations in Three.js applications.
