@@ -42,7 +42,10 @@ describe('FBXAnimationControls - Edge Cases and Error Handling', () => {
 
 			extremeCases.forEach(({ time, expectedPattern }) => {
 				expect(() => {
-					const display = FBXAnimationControls.getAnimationTimeDisplayString(time, outputTimeFormats.MM_SS_MS);
+					const display = FBXAnimationControls.getAnimationTimeDisplayString(
+						time,
+						outputTimeFormats.MM_SS_MS
+					);
 					expect(display).toMatch(expectedPattern);
 				}).not.toThrow();
 			});
@@ -78,7 +81,7 @@ describe('FBXAnimationControls - Edge Cases and Error Handling', () => {
 				0.999, // 99.9 centiseconds -> should be 99, not 00
 			];
 
-			edgeCases.forEach(time => {
+			edgeCases.forEach((time) => {
 				const result = FBXAnimationControls.getAnimationTimeDisplayString(time, outputTimeFormats.MM_SS_MS);
 				expect(result).toBe('00:00:99');
 			});
@@ -109,14 +112,14 @@ describe('FBXAnimationControls - Edge Cases and Error Handling', () => {
 				{ time: 0.995, expected: '00:00:99' },
 				{ time: 0.998, expected: '00:00:99' },
 				{ time: 0.999, expected: '00:00:99' },
-				{ time: 1.000, expected: '00:01:00' },
+				{ time: 1.0, expected: '00:01:00' },
 				{ time: 1.001, expected: '00:01:00' },
 				{ time: 1.01, expected: '00:01:01' },
 				// Test around minute boundaries too
 				{ time: 59.99, expected: '00:59:99' },
-				{ time: 60.00, expected: '01:00:00' },
+				{ time: 60.0, expected: '01:00:00' },
 				{ time: 60.01, expected: '01:00:01' },
-				{ time: 61.00, expected: '01:01:00' },
+				{ time: 61.0, expected: '01:01:00' },
 				{ time: 61.01, expected: '01:01:01' },
 			];
 
@@ -132,12 +135,12 @@ describe('FBXAnimationControls - Edge Cases and Error Handling', () => {
 
 			// Test percentage values around second boundaries
 			const percentages = [
-				8.33,  // Around 10 seconds
-				8.34,  // Should show next centisecond, not skip to next second
+				8.33, // Around 10 seconds
+				8.34, // Should show next centisecond, not skip to next second
 				8.35,
 			];
 
-			percentages.forEach(percentage => {
+			percentages.forEach((percentage) => {
 				const time = (percentage / 100) * animationDuration;
 				const display = FBXAnimationControls.getAnimationTimeDisplayString(time, outputTimeFormats.MM_SS_MS);
 
@@ -162,7 +165,10 @@ describe('FBXAnimationControls - Edge Cases and Error Handling', () => {
 				const timeInSeconds = (percentage / 100) * animationDuration;
 				expect(timeInSeconds).toBeCloseTo(expectedTime, 3);
 
-				const formatted = FBXAnimationControls.getAnimationTimeDisplayString(timeInSeconds, outputTimeFormats.MM_SS_MS);
+				const formatted = FBXAnimationControls.getAnimationTimeDisplayString(
+					timeInSeconds,
+					outputTimeFormats.MM_SS_MS
+				);
 				expect(formatted).toBe(expectedDisplay);
 			});
 		});
@@ -173,18 +179,24 @@ describe('FBXAnimationControls - Edge Cases and Error Handling', () => {
 
 			// Step 1: Move to 0.99 seconds (9.9%)
 			const step1Time = (9.9 / 100) * animationDuration;
-			const step1Display = FBXAnimationControls.getAnimationTimeDisplayString(step1Time, outputTimeFormats.MM_SS_MS);
+			const step1Display = FBXAnimationControls.getAnimationTimeDisplayString(
+				step1Time,
+				outputTimeFormats.MM_SS_MS
+			);
 			expect(step1Display).toBe('00:00:99');
 
 			// Step 2: Move to 1.00 seconds (10%) - should show 00:01:00, NOT 00:00:00
 			const step2Time = (10.0 / 100) * animationDuration;
-			const step2Display = FBXAnimationControls.getAnimationTimeDisplayString(step2Time, outputTimeFormats.MM_SS_MS);
+			const step2Display = FBXAnimationControls.getAnimationTimeDisplayString(
+				step2Time,
+				outputTimeFormats.MM_SS_MS
+			);
 			expect(step2Display).toBe('00:01:00');
 			expect(step2Display).not.toBe('00:00:00'); // Specifically test against the reported bug
 
 			// Test critical boundary values that might trigger the bug
 			const criticalTimes = [1.0, 1.0001, 0.9999, 0.9995];
-			criticalTimes.forEach(time => {
+			criticalTimes.forEach((time) => {
 				const display = FBXAnimationControls.getAnimationTimeDisplayString(time, outputTimeFormats.MM_SS_MS);
 				if (time >= 1.0) {
 					expect(display).not.toBe('00:00:00');
@@ -234,8 +246,8 @@ describe('FBXAnimationControls - Edge Cases and Error Handling', () => {
 			const percentageInputs = [0, 50, 100, -10, 150, '25', '0'];
 
 			expect(() => {
-				timeInputs.forEach(input => controls.setTime(input));
-				percentageInputs.forEach(input => controls.setPercentage(input));
+				timeInputs.forEach((input) => controls.setTime(input));
+				percentageInputs.forEach((input) => controls.setPercentage(input));
 			}).not.toThrow();
 		});
 	});
@@ -249,7 +261,7 @@ describe('FBXAnimationControls - Edge Cases and Error Handling', () => {
 				isRunning: jest.fn(() => false),
 				play: jest.fn(),
 				paused: false,
-				time: 0
+				time: 0,
 			};
 
 			controls.__attachedMesh = mockMesh;
@@ -266,9 +278,9 @@ describe('FBXAnimationControls - Edge Cases and Error Handling', () => {
 			// Test when animation IS running (different branch)
 			jest.clearAllMocks();
 			mockAction.isRunning.mockReturnValue(true);
-			
+
 			controls.play();
-			
+
 			// Should still set flags but not call play() again
 			expect(mockAction.play).not.toHaveBeenCalled();
 		});
@@ -278,7 +290,7 @@ describe('FBXAnimationControls - Edge Cases and Error Handling', () => {
 			const mockMesh = { animations: [{ duration: 10.0 }] };
 			const mockAction = {
 				paused: false,
-				time: 0
+				time: 0,
 			};
 
 			controls.__attachedMesh = mockMesh;
@@ -296,9 +308,9 @@ describe('FBXAnimationControls - Edge Cases and Error Handling', () => {
 			// Test pause when not playing (different branch)
 			jest.clearAllMocks();
 			controls.__playAnimationFlag = false;
-			
+
 			controls.pause();
-			
+
 			// Should not dispatch PAUSE event when not playing
 			expect(eventSpy).not.toHaveBeenCalledWith('PAUSE');
 		});
@@ -309,7 +321,7 @@ describe('FBXAnimationControls - Edge Cases and Error Handling', () => {
 			const mockAction = {
 				getClip: () => ({ duration: 10.0 }),
 				stop: jest.fn(),
-				time: 0
+				time: 0,
 			};
 
 			controls.__attachedMesh = mockMesh;
@@ -331,9 +343,9 @@ describe('FBXAnimationControls - Edge Cases and Error Handling', () => {
 			// Test stop when not playing (different branch)
 			jest.clearAllMocks();
 			controls.__playAnimationFlag = false;
-			
+
 			controls.stop();
-			
+
 			// Should not perform stop actions when not playing
 			expect(eventSpy).not.toHaveBeenCalledWith('STOP');
 		});
@@ -343,7 +355,7 @@ describe('FBXAnimationControls - Edge Cases and Error Handling', () => {
 			const mockMesh = { animations: [{ duration: 10.0 }] };
 			const mockAction = {
 				getClip: () => ({ duration: 10.0 }),
-				time: 0
+				time: 0,
 			};
 
 			controls.__attachedMesh = mockMesh;
@@ -363,7 +375,7 @@ describe('FBXAnimationControls - Edge Cases and Error Handling', () => {
 		test('should handle HTML controls when they might not exist', () => {
 			// Test when controls are created without HTML
 			const noHtmlControls = new FBXAnimationControls(container, { initHTMLControls: false });
-			
+
 			expect(() => {
 				noHtmlControls.play();
 				noHtmlControls.pause();
@@ -378,7 +390,7 @@ describe('FBXAnimationControls - Edge Cases and Error Handling', () => {
 			const noHtmlControls = new FBXAnimationControls(container, { initHTMLControls: false });
 			const mockMesh = { animations: [{ duration: 10.0 }] };
 			const mockMixer = { update: jest.fn() };
-			
+
 			noHtmlControls.__attachedMesh = mockMesh;
 			noHtmlControls.__attachedMesh.mixer = mockMixer;
 			noHtmlControls.__playAnimationFlag = true;

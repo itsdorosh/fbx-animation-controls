@@ -1,5 +1,11 @@
 import { jest } from '@jest/globals';
-import { FBXAnimationControls, outputTimeFormats, defaultConfiguration, eventTypes, defaultIcons } from '../FBXAnimationControls.js';
+import {
+	FBXAnimationControls,
+	outputTimeFormats,
+	defaultConfiguration,
+	eventTypes,
+	defaultIcons,
+} from '../FBXAnimationControls.js';
 
 // Mock Three.js before importing
 const mockClip = { duration: 10.0 };
@@ -9,16 +15,16 @@ const mockAction = {
 	play: jest.fn(),
 	stop: jest.fn(),
 	paused: false,
-	time: 0
+	time: 0,
 };
 const mockMixer = {
 	update: jest.fn(),
-	clipAction: jest.fn(() => mockAction)
+	clipAction: jest.fn(() => mockAction),
 };
 
 jest.mock('three', () => ({
 	AnimationMixer: jest.fn(() => mockMixer),
-	Clock: jest.fn(() => ({ getDelta: jest.fn(() => 0.016) }))
+	Clock: jest.fn(() => ({ getDelta: jest.fn(() => 0.016) })),
 }));
 
 describe('FBXAnimationControls - Core Functionality', () => {
@@ -152,7 +158,7 @@ describe('FBXAnimationControls - Core Functionality', () => {
 	describe('Mesh Attachment and Animation Control', () => {
 		test('should handle attach with attachOptions', () => {
 			const mockMesh = {
-				animations: [mockClip]
+				animations: [mockClip],
 			};
 
 			const playSpy = jest.spyOn(controls, 'play');
@@ -170,7 +176,7 @@ describe('FBXAnimationControls - Core Functionality', () => {
 
 		test('should handle attach without attachOptions', () => {
 			const mockMesh = {
-				animations: [mockClip]
+				animations: [mockClip],
 			};
 
 			const dispatchSpy = jest.spyOn(controls, 'dispatch');
@@ -183,7 +189,7 @@ describe('FBXAnimationControls - Core Functionality', () => {
 
 		test('should throw error when attaching same mesh twice', () => {
 			const mockMesh = {
-				animations: [mockClip]
+				animations: [mockClip],
 			};
 
 			controls.attach(mockMesh);
@@ -195,7 +201,7 @@ describe('FBXAnimationControls - Core Functionality', () => {
 
 		test('should handle full animation workflow with HTML controls', () => {
 			const mockMesh = {
-				animations: [mockClip]
+				animations: [mockClip],
 			};
 
 			controls.attach(mockMesh);
@@ -217,7 +223,7 @@ describe('FBXAnimationControls - Core Functionality', () => {
 
 		test('should handle setTime with both number and string types', () => {
 			const mockMesh = {
-				animations: [mockClip]
+				animations: [mockClip],
 			};
 
 			controls.attach(mockMesh);
@@ -237,7 +243,7 @@ describe('FBXAnimationControls - Core Functionality', () => {
 
 		test('should handle play/pause/stop state transitions with animation', () => {
 			const mockMesh = {
-				animations: [mockClip]
+				animations: [mockClip],
 			};
 
 			controls.attach(mockMesh);
@@ -277,7 +283,7 @@ describe('FBXAnimationControls - Core Functionality', () => {
 
 		test('should reset HTML controls when detaching', () => {
 			const mockMesh = {
-				animations: [mockClip]
+				animations: [mockClip],
 			};
 
 			controls.attach(mockMesh);
@@ -338,7 +344,7 @@ describe('FBXAnimationControls - Core Functionality', () => {
 
 		test('should update mixer when attached', () => {
 			const mockMesh = {
-				animations: [mockClip]
+				animations: [mockClip],
 			};
 
 			controls.attach(mockMesh);
@@ -349,7 +355,7 @@ describe('FBXAnimationControls - Core Functionality', () => {
 
 		test('should update HTML controls when playing', () => {
 			const mockMesh = {
-				animations: [mockClip]
+				animations: [mockClip],
 			};
 
 			controls.attach(mockMesh);
@@ -371,7 +377,7 @@ describe('FBXAnimationControls - Core Functionality', () => {
 
 		test('should not update HTML controls when not playing', () => {
 			const mockMesh = {
-				animations: [mockClip]
+				animations: [mockClip],
 			};
 
 			controls.attach(mockMesh);
@@ -438,7 +444,7 @@ describe('FBXAnimationControls - Core Functionality', () => {
 		test('should handle slider mousedown event to pause animation', () => {
 			// Set up a mock mesh so we can test with actual animation state
 			const mockMesh = {
-				animations: [mockClip]
+				animations: [mockClip],
 			};
 
 			controls.attach(mockMesh);
@@ -463,7 +469,7 @@ describe('FBXAnimationControls - Core Functionality', () => {
 		test('should handle complete slider interaction workflow with actual event handlers', () => {
 			// Set up a mock mesh
 			const mockMesh = {
-				animations: [mockClip]
+				animations: [mockClip],
 			};
 
 			controls.attach(mockMesh);
@@ -509,7 +515,7 @@ describe('FBXAnimationControls - Core Functionality', () => {
 		test('should handle slider interaction workflow correctly', () => {
 			// Set up a mock mesh
 			const mockMesh = {
-				animations: [mockClip]
+				animations: [mockClip],
 			};
 
 			controls.attach(mockMesh);
@@ -546,7 +552,7 @@ describe('FBXAnimationControls - Core Functionality', () => {
 		test('should handle slider mousedown when animation was not playing', () => {
 			// Set up a mock mesh
 			const mockMesh = {
-				animations: [mockClip]
+				animations: [mockClip],
 			};
 
 			controls.attach(mockMesh);
@@ -573,7 +579,7 @@ describe('FBXAnimationControls - Core Functionality', () => {
 		test('should handle play button click behavior', () => {
 			// Set up a mock mesh
 			const mockMesh = {
-				animations: [mockClip]
+				animations: [mockClip],
 			};
 
 			controls.attach(mockMesh);

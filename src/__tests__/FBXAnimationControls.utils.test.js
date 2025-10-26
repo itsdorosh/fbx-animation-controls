@@ -54,13 +54,13 @@ describe('FBXAnimationControls - Utility Functions', () => {
 				{ time: 0.995, expected: '00:00:99' },
 				{ time: 0.998, expected: '00:00:99' },
 				{ time: 0.999, expected: '00:00:99' },
-				{ time: 1.000, expected: '00:01:00' },
+				{ time: 1.0, expected: '00:01:00' },
 				{ time: 1.001, expected: '00:01:00' },
 				{ time: 1.01, expected: '00:01:01' },
 				{ time: 59.99, expected: '00:59:99' },
-				{ time: 60.00, expected: '01:00:00' },
+				{ time: 60.0, expected: '01:00:00' },
 				{ time: 60.01, expected: '01:00:01' },
-				{ time: 61.00, expected: '01:01:00' },
+				{ time: 61.0, expected: '01:01:00' },
 				{ time: 61.01, expected: '01:01:01' },
 			];
 
@@ -86,7 +86,10 @@ describe('FBXAnimationControls - Utility Functions', () => {
 				const timeInSeconds = (percentage / 100) * animationDuration;
 				expect(timeInSeconds).toBeCloseTo(expectedTime, 3);
 
-				const formatted = FBXAnimationControls.getAnimationTimeDisplayString(timeInSeconds, outputTimeFormats.MM_SS_MS);
+				const formatted = FBXAnimationControls.getAnimationTimeDisplayString(
+					timeInSeconds,
+					outputTimeFormats.MM_SS_MS
+				);
 				expect(formatted).toBe(expectedDisplay);
 			});
 		});
@@ -95,12 +98,15 @@ describe('FBXAnimationControls - Utility Functions', () => {
 			const animationDuration = 10.0;
 			const sliderValues = [9.9, 10.0, 10.1, 9.95];
 
-			sliderValues.forEach(sliderValue => {
+			sliderValues.forEach((sliderValue) => {
 				// Convert slider percentage to time
 				const calculatedTime = (parseFloat(sliderValue) / 100) * animationDuration;
 
 				// Convert time to display string
-				const displayString = FBXAnimationControls.getAnimationTimeDisplayString(calculatedTime, outputTimeFormats.MM_SS_MS);
+				const displayString = FBXAnimationControls.getAnimationTimeDisplayString(
+					calculatedTime,
+					outputTimeFormats.MM_SS_MS
+				);
 
 				// Convert time back to slider percentage (like in updateHTMLControls)
 				const backToSliderValue = (calculatedTime.toFixed(3) / animationDuration) * 100;
@@ -135,7 +141,7 @@ describe('FBXAnimationControls - Utility Functions', () => {
 			const displays = new Set();
 
 			// Test fine-grained slider movements around the 4-second boundary
-			for (let percentage = 39.90; percentage <= 40.15; percentage += 0.01) {
+			for (let percentage = 39.9; percentage <= 40.15; percentage += 0.01) {
 				const time = (percentage / 100) * animationDuration;
 				const display = FBXAnimationControls.getAnimationTimeDisplayString(time, outputTimeFormats.MM_SS_MS);
 				displays.add(display);
@@ -152,20 +158,29 @@ describe('FBXAnimationControls - Utility Functions', () => {
 
 			// Step 1: Move to 0.99 seconds (9.9%)
 			const step1Time = (9.9 / 100) * animationDuration;
-			const step1Display = FBXAnimationControls.getAnimationTimeDisplayString(step1Time, outputTimeFormats.MM_SS_MS);
+			const step1Display = FBXAnimationControls.getAnimationTimeDisplayString(
+				step1Time,
+				outputTimeFormats.MM_SS_MS
+			);
 			expect(step1Display).toBe('00:00:99');
 
 			// Step 2: Move to 1.00 seconds (10%) - should show 00:01:00, NOT 00:00:00
 			const step2Time = (10.0 / 100) * animationDuration;
-			const step2Display = FBXAnimationControls.getAnimationTimeDisplayString(step2Time, outputTimeFormats.MM_SS_MS);
+			const step2Display = FBXAnimationControls.getAnimationTimeDisplayString(
+				step2Time,
+				outputTimeFormats.MM_SS_MS
+			);
 			expect(step2Display).toBe('00:01:00');
 			expect(step2Display).not.toBe('00:00:00'); // Specifically test against the reported bug
 
 			// Step 3: Go back a little bit - should show appropriate times
 			const backPercentages = [9.99, 9.98, 9.97, 9.96, 9.95, 9.94, 9.93, 9.92, 9.91, 9.9];
-			backPercentages.forEach(percentage => {
+			backPercentages.forEach((percentage) => {
 				const backTime = (percentage / 100) * animationDuration;
-				const backDisplay = FBXAnimationControls.getAnimationTimeDisplayString(backTime, outputTimeFormats.MM_SS_MS);
+				const backDisplay = FBXAnimationControls.getAnimationTimeDisplayString(
+					backTime,
+					outputTimeFormats.MM_SS_MS
+				);
 
 				// Should never show 00:00:00 for times significantly greater than 0
 				if (backTime > 0.5) {
@@ -190,7 +205,7 @@ describe('FBXAnimationControls - Utility Functions', () => {
 			// Create mock setup for testing
 			const mockAction = {
 				time: 2.5,
-				getClip: () => ({ duration: 10.0 })
+				getClip: () => ({ duration: 10.0 }),
 			};
 
 			controls.__attachedMesh = { animations: [] };
@@ -207,7 +222,10 @@ describe('FBXAnimationControls - Utility Functions', () => {
 		test('should handle floating point precision in time calculations', () => {
 			// Test the Math.max(0, calculatedTime) logic
 			const verySmallNegative = -1e-15;
-			const result = FBXAnimationControls.getAnimationTimeDisplayString(Math.max(0, verySmallNegative), outputTimeFormats.MM_SS_MS);
+			const result = FBXAnimationControls.getAnimationTimeDisplayString(
+				Math.max(0, verySmallNegative),
+				outputTimeFormats.MM_SS_MS
+			);
 			expect(result).toBe('00:00:00');
 		});
 
