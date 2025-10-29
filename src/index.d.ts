@@ -23,6 +23,8 @@ export interface IAttachOptions {
 	play?: boolean;
 	/** Set the animation to a specific time (in seconds) or time string */
 	atTime?: string | number;
+	/** Index of the animation to select initially (0-based). If not specified, uses autoSelectFirstAnimation setting */
+	animationIndex?: number;
 }
 
 /**
@@ -33,6 +35,10 @@ export interface IControlsConfiguration {
 	outputFormat?: OutputTimeFormats;
 	/** Whether to initialize HTML controls for the animation */
 	initHTMLControls?: boolean;
+	/** Whether to enable animation selector dropdown for multiple animations */
+	enableAnimationSelector?: boolean;
+	/** Whether to automatically select the first animation when attaching a mesh */
+	autoSelectFirstAnimation?: boolean;
 }
 
 /**
@@ -53,6 +59,10 @@ export enum EventTypes {
 	CHANGE_PERCENTAGE = 'CHANGE_PERCENTAGE',
 	/** Fired when animation time changes */
 	CHANGE_TIME = 'CHANGE_TIME',
+	/** Fired when an animation is selected (including first selection) */
+	ANIMATION_SELECTED = 'ANIMATION_SELECTED',
+	/** Fired when animation track changes (switching between different animations) */
+	ANIMATION_TRACK_CHANGED = 'ANIMATION_TRACK_CHANGED',
 }
 
 /**
@@ -60,6 +70,34 @@ export enum EventTypes {
  * @param data - Optional data passed with the event
  */
 export type EventCallback = (data?: any) => void;
+
+/**
+ * Information about an animation track
+ */
+export interface IAnimationTrackInfo {
+	/** Zero-based index of the animation */
+	index: number;
+	/** Name of the animation (from clip or generated) */
+	name: string;
+	/** Duration of the animation in seconds */
+	duration: number;
+	/** Number of tracks in the animation */
+	tracks: number;
+	/** Unique identifier for the animation */
+	uuid: string;
+}
+
+/**
+ * Data structure for animation selection events
+ */
+export interface IAnimationSelectionEventData {
+	/** Information about the selected animation */
+	animationInfo: IAnimationTrackInfo;
+	/** Index of the previously selected animation (-1 if none) */
+	previousIndex: number;
+	/** Index of the currently selected animation */
+	currentIndex: number;
+}
 
 /**
  * FBX Animation Controls - A comprehensive animation control system for Three.js FBX models
@@ -91,6 +129,9 @@ export class FBXAnimationControls {
 	private __clock: Clock;
 	private __eventCallbacks: Record<string, EventCallback[]>;
 	private __configuration: IControlsConfiguration;
+	private __availableAnimations: IAnimationTrackInfo[];
+	private __currentAnimationIndex: number;
+	private __animationTracks: Map<number, any>;
 
 	/**
 	 * Creates a new FBX Animation Controls instance
@@ -140,6 +181,36 @@ export class FBXAnimationControls {
 	public get isHTMLControlsAvailable(): boolean;
 
 	/**
+	 * Gets the list of available animations in the attached mesh
+	 * @returns Array of animation track information
+	 */
+	public get availableAnimations(): IAnimationTrackInfo[];
+
+	/**
+	 * Gets the index of the currently selected animation
+	 * @returns Current animation index, or -1 if none selected
+	 */
+	public get currentAnimationIndex(): number;
+
+	/**
+	 * Gets information about the currently selected animation track
+	 * @returns Current animation track info, or null if none selected
+	 */
+	public get currentAnimationTrack(): IAnimationTrackInfo | null;
+
+	/**
+	 * Checks if the attached mesh has multiple animations
+	 * @returns True if there are multiple animations available
+	 */
+	public get hasMultipleAnimations(): boolean;
+
+	/**
+	 * Checks if the animation selector feature is enabled
+	 * @returns True if animation selector is enabled in configuration
+	 */
+	public get isAnimationSelectorEnabled(): boolean;
+
+	/**
 	 * Converts animation time to a formatted display string
 	 *
 	 * @param time - Time in seconds to convert
@@ -156,6 +227,22 @@ export class FBXAnimationControls {
 	 * ```
 	 */
 	static getAnimationTimeDisplayString(time: number, outputFormat: OutputTimeFormats): string;
+
+	/**
+	 * Gets information about an animation track from a Three.js AnimationClip
+	 *
+	 * @param animationClip - The Three.js AnimationClip to analyze
+	 * @param index - The index of this animation in the collection
+	 * @returns Animation track information object
+	 * @throws Error if animationClip is null or undefined
+	 *
+	 * @example
+	 * ```typescript
+	 * const trackInfo = FBXAnimationControls.getAnimationTrackInfo(clip, 0);
+	 * console.log(`Animation: ${trackInfo.name}, Duration: ${trackInfo.duration}s`);
+	 * ```
+	 */
+	static getAnimationTrackInfo(animationClip: any, index: number): IAnimationTrackInfo;
 
 	/**
 	 * Initializes the HTML controls UI (private method)
@@ -328,4 +415,81 @@ export class FBXAnimationControls {
 	 * ```
 	 */
 	public dispatch(eventName: EventTypes | string, data?: any): void;
+
+	/**
+	 * Selects an animation by its index
+	 *
+	 * @param index - Zero-based index of the animation to select
+	 * @returns Information about the selected animation
+	 * @throws Error if no mesh is attached or index is invalid
+	 *
+	 * @example
+	 * ```typescript
+	 * const selectedAnimation = controls.selectAnimation(1);
+	 * console.log(`Selected: ${selectedAnimation.name}`);
+	 * ```
+	 */
+	public selectAnimation(index: number): IAnimationTrackInfo;
+
+	/**
+	 * Selects an animation by its name
+	 *
+	 * @param name - Name of the animation to select
+	 * @returns Information about the selected animation
+	 * @throws Error if no mesh is attached or animation name not found
+	 *
+	 * @example
+	 * ```typescript
+	 * const selectedAnimation = controls.selectAnimationByName('Run');
+	 * console.log(`Selected: ${selectedAnimation.name}`);
+	 * ```
+	 */
+	public selectAnimationByName(name: string): IAnimationTrackInfo;
+
+	/**
+	 * Gets a list of all available animations
+	 *
+	 * @returns Array of animation track information (copy of internal array)
+	 *
+	 * @example
+	 * ```typescript
+	 * const animations = controls.getAnimationList();
+	 * animations.forEach((anim, index) => {
+	 *   console.log(`${index}: ${anim.name} (${anim.duration}s)`);
+	 * });
+	 * ```
+	 */
+	public getAnimationList(): IAnimationTrackInfo[];
+
+	/**
+	 * Gets animation information by index
+	 *
+	 * @param index - Zero-based index of the animation
+	 * @returns Animation track information, or null if index is invalid
+	 *
+	 * @example
+	 * ```typescript
+	 * const animation = controls.getAnimationByIndex(0);
+	 * if (animation) {
+	 *   console.log(`First animation: ${animation.name}`);
+	 * }
+	 * ```
+	 */
+	public getAnimationByIndex(index: number): IAnimationTrackInfo | null;
+
+	/**
+	 * Gets animation information by name
+	 *
+	 * @param name - Name of the animation to find
+	 * @returns Animation track information, or null if not found
+	 *
+	 * @example
+	 * ```typescript
+	 * const walkAnimation = controls.getAnimationByName('Walk');
+	 * if (walkAnimation) {
+	 *   console.log(`Walk animation duration: ${walkAnimation.duration}s`);
+	 * }
+	 * ```
+	 */
+	public getAnimationByName(name: string): IAnimationTrackInfo | null;
 }
