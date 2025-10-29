@@ -62,6 +62,7 @@ export class FBXAnimationControls {
 		this.__animationAction = null;
 		this.__playAnimationFlag = false;
 		this.__stopAnimationFlag = true;
+		this.__currentAnimationTrack = null;
 		this.__duration = this.__timePlaceholder;
 		this.__innerContainer = domElement;
 		this.__clock = new Clock();
@@ -293,7 +294,7 @@ export class FBXAnimationControls {
 	}
 
 	update() {
-		if (this.__attachedMesh && this.__attachedMesh.mixer) this.__attachedMesh.mixer.update(this.__clock.getDelta());
+		if (this.__attachedMesh && this.__attachedMesh.mixer && this.__currentAnimationTrack) this.__attachedMesh.mixer.update(this.__clock.getDelta());
 		if (this.__animationAction && this.isPlaying) this.__updateHTMLControlsIfAvailable();
 	}
 
